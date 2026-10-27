@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>食卓</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1F2A24">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1EC; --card:#FFFFFF; --ink:#1F2A24; --sub:#5E6B63; --line:#D5DCD4;
+  --ai:#2F4A7A; --ai-soft:#E3E9F3; --ok:#2E7447; --ok-soft:#E2EFE5; --mid:#A86F0C; --mid-soft:#F6EDD8; --bad:#B2382C; --bad-soft:#F5E1DE;
+  --staple:#C9A66B; --main:#B5654F; --side:#5E9A62; --track:#DDE3DB; --zone:#B9DDC3; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141A17; --card:#1D2521; --ink:#E6ECE7; --sub:#9AA79F; --line:#2E3A34;
+  --ai:#8FAAD8; --ai-soft:#24314A; --ok:#7CC293; --ok-soft:#1F3328; --mid:#E0B45A; --mid-soft:#3A3020; --bad:#E08A7F; --bad-soft:#3E2522;
+  --staple:#D8B97F; --main:#D48A73; --side:#86BF8A; --track:#2A3530; --zone:#2E5A3D; color-scheme:dark; } }
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;font-size:16px;line-height:1.6}
+main{max-width:34rem;margin:0 auto;padding:1rem 1rem 6.5rem}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:.02em;margin:.2rem 0 .8rem}
+h2{font-size:1.05rem;font-weight:700;margin:1.2rem 0 .5rem}
+p{margin:.3rem 0}
+.note{font-size:.85rem;color:var(--sub)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin:.5rem 0}
+.row{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:.35rem .85rem;font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--ai);border-color:var(--ai);color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#101521} }
+.btn{border:0;background:var(--ai);color:#fff;border-radius:10px;padding:.55rem 1rem;font-weight:700}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn{color:#101521} }
+.btn.ghost{background:transparent;color:var(--ai);border:1px solid var(--ai)}
+.btn.sm{padding:.35rem .75rem;font-size:.88rem}
+.linkx{border:0;background:none;color:var(--sub);text-decoration:underline;padding:.2rem}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .65rem;width:100%}
+textarea{min-height:6em}
+.tag{font-size:.72rem;padding:.05rem .5rem;border-radius:999px;border:1px solid var(--line);color:var(--sub)}
+.tag.s{border-color:var(--staple);color:var(--staple)} .tag.m{border-color:var(--main);color:var(--main)} .tag.d{border-color:var(--side);color:var(--side)}
+.plan{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.75rem .9rem;margin:.45rem 0}
+.plan .t{font-weight:700}
+.plan.dim{opacity:.55}
+.badge{font-size:.72rem;padding:.05rem .5rem;border-radius:6px;background:var(--ok-soft);color:var(--ok);font-weight:700}
+.badge.why{background:var(--ai-soft);color:var(--ai)}
+.badge.miss{background:var(--bad-soft);color:var(--bad)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav.tabs button{flex:1;border:0;background:none;padding:.7rem 0 .75rem;font-size:.82rem;color:var(--sub)}
+nav.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700;box-shadow:inset 0 3px 0 var(--ai)}
+.nut{padding:.45rem 0;border-bottom:1px solid var(--line)}
+.nut:last-child{border-bottom:0}
+.nut .top{display:flex;align-items:baseline;gap:.5rem}
+.nut .lab{font-weight:700;flex:1}
+.nut .val{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums}
+.nut .unit{font-size:.78rem;color:var(--sub);margin-left:.1rem}
+.pill{font-size:.75rem;font-weight:700;padding:.05rem .55rem;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.mid{background:var(--mid-soft);color:var(--mid)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.na{background:var(--bg);color:var(--sub)}
+.nut .bar2{position:relative;height:.8rem;border-radius:999px;background:var(--track);margin:.4rem 0 .25rem;overflow:hidden}
+.nut .bar2 .zone{position:absolute;top:0;bottom:0;background:var(--zone);border-left:3px solid var(--ok);border-right:3px solid var(--ok)}
+.nut .bar2 .zone.open{border-right:0}
+.nut .bar2 .zone.from0{border-left:0}
+.nut .bar2 .fill{position:absolute;left:0;top:.18rem;bottom:.18rem;border-radius:999px}
+.nut .bar2 .fill.over{border-radius:999px 2px 2px 999px;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.35) 0 4px,transparent 4px 8px)}
+.nut .bar2 .mark{position:absolute;top:0;bottom:0;width:3px;background:var(--ok)}
+.nut .rng .over-t{font-weight:700}
+.nut .rng{font-size:.78rem;color:var(--sub);font-variant-numeric:tabular-nums}
+.ngrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.25rem;margin:.35rem 0 .1rem;text-align:center}
+.ngrid div{background:var(--bg);border-radius:8px;padding:.25rem .1rem;font-size:.72rem;color:var(--sub);line-height:1.3}
+.ngrid b{display:block;font-size:.88rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.sig{display:grid;grid-template-columns:6.2rem 1fr 4.6rem;gap:.5rem;align-items:center;font-size:.9rem;padding:.2rem 0}
+.track{position:relative;height:.6rem;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.track .zone{position:absolute;top:0;bottom:0;background:var(--ok-soft)}
+.track .dot{position:absolute;top:-1px;width:.6rem;height:.6rem;border-radius:50%;transform:translateX(-50%)}
+.st{font-size:.8rem;text-align:right;font-weight:700}
+.st.ok{color:var(--ok)} .st.mid{color:var(--mid)} .st.bad{color:var(--bad)}
+.sheet{position:fixed;inset:auto 0 0 0;max-height:88vh;overflow:auto;background:var(--card);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:1rem 1rem calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:20;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:19}
+.item{border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem;margin:.4rem 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:none;padding:.25rem .55rem;font-size:.82rem}
+.seg button[aria-pressed="true"]{background:var(--ai-soft);color:var(--ai);font-weight:700}
+.sat-wrap{position:sticky;bottom:calc(-1.2rem - env(safe-area-inset-bottom,0px));background:var(--card);padding:.6rem 0 .4rem;margin-top:.6rem;border-top:1px solid var(--line)}
+.sat{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-top:.4rem}
+.sat button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:.6rem 0;font-weight:700}
+.sat button:first-child{border-color:var(--ok);color:var(--ok)}
+.stockgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}
+.stock{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:.55rem .7rem;text-align:left;font-size:.92rem}
+.lvl{font-size:.75rem;padding:.05rem .5rem;border-radius:999px;font-weight:700;white-space:nowrap;flex:none}
+.list-li>span:first-child{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.list-li>.note{font-size:.76rem;text-align:right;max-width:45%}
+.lvl.a{background:var(--ok-soft);color:var(--ok)} .lvl.l{background:var(--mid-soft);color:var(--mid)} .lvl.n{background:var(--bad-soft);color:var(--bad)}
+.plate-wrap{display:flex;gap:1rem;align-items:center}
+.plate-wrap svg{flex:none}
+.toast{position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:.5rem 1rem;border-radius:10px;font-size:.9rem;z-index:30}
+.list-li{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.93rem}
+.list-li:last-child{border-bottom:0}
+.micro{display:grid;grid-template-columns:7rem 1fr 4.6rem;gap:.5rem;align-items:center;font-size:.88rem;padding:.15rem 0}
+.mbar{height:.55rem;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.mbar span{display:block;height:100%}
+.cook{position:fixed;inset:0;z-index:25;background:var(--card);padding:calc(1rem + env(safe-area-inset-top,0px)) 1.2rem calc(1rem + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column}
+.cook-dots{display:flex;gap:.3rem;margin:.6rem 0 1rem}
+.cook-dots i{flex:1;height:.35rem;border-radius:999px;background:var(--track)}
+.cook-dots i.done{background:var(--ok)} .cook-dots i.now{background:var(--ai)}
+.cook-text{font-size:1.55rem;line-height:1.55;font-weight:700;flex:1;margin:0}
+.cook-timer{display:flex;align-items:center;justify-content:space-between;gap:.8rem;background:var(--bg);border-radius:14px;padding:.8rem 1rem;margin-bottom:1rem}
+#tm-disp{font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.cook-nav{display:grid;grid-template-columns:1fr 2fr;gap:.6rem}
+.cook-nav .btn{padding:1.1rem 0;font-size:1.15rem}
+.hide{display:none!important}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav class="tabs" role="tablist" aria-label="食卓">
+  <button role="tab" data-tab="now">いま</button>
+  <button role="tab" data-tab="log">記録</button>
+  <button role="tab" data-tab="stock">調達</button>
+  <button role="tab" data-tab="weight">体重</button>
+  <button role="tab" data-tab="book">図鑑</button>
+  <button role="tab" data-tab="set">設定</button>
+</nav>
+<script>
+/* 最初から入っている図鑑。値はふつうの1人前の見込み(推定)。
+   [名前, 別名, 型, 形(主食・主菜・副菜の3桁), kcal, たんぱく質, 脂質, 炭水化物, 食物繊維, 食塩, 野菜の皿, 汁の塩分, 作り方, 細かい栄養8つ(カルシウム,鉄,カリウム,ビタミンA,ビタミンB群,ビタミンC,ビタミンD,オメガ3 を 1〜4), 常備品のつながり] */
+const STARTER_FOODS = [
+ ["ごはん(茶碗1杯)", "白ごはん,米", "主食", "100", 234, 3.8, 0.5, 55.7, 0.5, 0, 0, 0, "煮る", "11111111", "rice"],
+ ["食パン(1枚)", "パン,トースト", "パン", "100", 149, 5.3, 2.5, 27.8, 2.5, 0.7, 0, 0, "焼く", "11111111", ""],
+ ["おにぎり(鮭)", "鮭おにぎり", "おにぎり", "100", 180, 5.5, 1.2, 38, 0.6, 1.0, 0, 0, "煮る", "11112132", ""],
+ ["おにぎり(ツナマヨ)", "ツナマヨおにぎり", "おにぎり", "100", 230, 5, 7, 37, 0.6, 1.1, 0, 0, "煮る", "11111121", ""],
+ ["かけうどん", "うどん", "麺", "100", 320, 9, 2, 62, 2, 5.5, 0, 3.5, "煮る", "11111111", ""],
+ ["ざるそば", "そば,もりそば", "麺", "100", 300, 12, 2, 60, 5, 2.5, 0, 1.5, "煮る", "12221111", ""],
+ ["しょうゆラーメン", "ラーメン,中華そば", "麺", "110", 470, 20, 14, 65, 3, 6.5, 0.3, 4.5, "煮る", "11212111", ""],
+ ["カップ麺", "カップラーメン", "麺", "100", 350, 9, 15, 44, 2, 5, 0, 3, "煮る", "11112111", ""],
+ ["ミートソーススパゲッティ", "パスタ,スパゲッティ", "麺", "110", 600, 22, 20, 80, 6, 3, 0.5, 0, "炒める", "22222211", ""],
+ ["鮭の塩焼き", "焼き鮭,焼き魚", "主菜", "010", 140, 20, 6, 0, 0, 1.5, 0, 0, "焼く", "11213144", ""],
+ ["サバの塩焼き", "焼きサバ", "主菜", "010", 250, 20, 18, 0, 0, 1.5, 0, 0, "焼く", "12213144", ""],
+ ["鶏の照り焼き", "照り焼きチキン", "主菜", "010", 280, 22, 16, 10, 0, 2, 0, 0, "焼く", "11212111", ""],
+ ["唐揚げ(5個)", "からあげ,鶏の唐揚げ", "主菜", "010", 380, 24, 24, 15, 0.5, 2, 0, 0, "揚げる", "11212111", ""],
+ ["豚の生姜焼き", "しょうが焼き", "主菜", "010", 330, 20, 23, 9, 0.5, 2, 0.3, 0, "焼く", "11214111", ""],
+ ["ハンバーグ", "", "主菜", "010", 400, 22, 26, 18, 1, 2, 0, 0, "焼く", "12212111", ""],
+ ["目玉焼き(卵1個)", "目玉焼き", "卵", "010", 100, 6.5, 7.5, 0.2, 0, 0.3, 0, 0, "焼く", "11122121", "egg"],
+ ["ゆで卵", "ゆでたまご", "卵", "010", 75, 6.5, 5, 0.2, 0, 0.2, 0, 0, "煮る", "11122121", "egg"],
+ ["納豆(1パック)", "なっとう", "大豆", "010", 95, 8, 5, 6, 3, 0.6, 0, 0, "生", "12212111", "natto"],
+ ["冷ややっこ", "豆腐,とうふ", "大豆", "010", 85, 10, 5, 2, 1, 0.5, 0, 0, "生", "22211111", "tofu"],
+ ["サラダチキン", "", "主菜", "010", 110, 24, 1.5, 0.5, 0, 1.2, 0, 0, "煮る", "11213111", ""],
+ ["ツナ缶", "ツナ,シーチキン", "主菜", "010", 190, 13, 15, 0, 0, 0.6, 0, 0, "生", "11112122", "tuna"],
+ ["カップのサラダ", "サラダ,野菜サラダ", "副菜", "001", 30, 1, 0.2, 6, 2, 0, 1, 0, "生", "11222211", ""],
+ ["ミニトマト(5個)", "トマト", "副菜", "001", 15, 0.5, 0.1, 3, 0.7, 0, 0.5, 0, "生", "11121211", ""],
+ ["ブロッコリー", "冷凍ブロッコリー", "副菜", "001", 25, 3, 0.4, 4, 3, 0, 1, 0, "蒸す", "11222241", "brocc"],
+ ["ほうれん草のおひたし", "おひたし", "副菜", "001", 25, 2, 0.3, 3, 2, 0.6, 1, 0, "煮る", "22342211", ""],
+ ["具だくさん味噌汁", "みそ汁,味噌汁", "汁物", "001", 80, 5, 3, 8, 2, 2, 1, 0, "煮る", "22322111", ""],
+ ["インスタント味噌汁", "インスタントみそ汁", "汁物", "000", 35, 2, 1, 4, 0.5, 1.8, 0.2, 0, "煮る", "11111111", "miso"],
+ ["野菜炒め", "", "副菜", "001", 180, 6, 12, 12, 4, 1.8, 2, 0, "炒める", "12332311", ""],
+ ["カット野菜(1袋)", "カット野菜", "副菜", "001", 20, 1, 0.1, 4, 2, 0, 1, 0, "生", "11211211", "cutveg"],
+ ["きんぴらごぼう", "きんぴら", "副菜", "001", 90, 1.5, 4, 11, 3, 1, 1, 0, "炒める", "11221111", ""],
+ ["ひじきの煮物", "ひじき", "副菜", "001", 70, 3, 3, 8, 4, 1.2, 0.5, 0, "煮る", "32321111", ""],
+ ["ヨーグルト", "", "乳製品", "000", 60, 3.6, 3, 5, 0, 0.1, 0, 0, "生", "31212111", "yog"],
+ ["牛乳(コップ1杯)", "ぎゅうにゅう,ミルク", "乳製品", "000", 130, 6.6, 7.6, 9.6, 0, 0.2, 0, 0, "生", "41222111", ""],
+ ["バナナ", "", "果物", "000", 90, 1.1, 0.2, 23, 1.1, 0, 0, 0, "生", "11312211", "banana"],
+ ["みかん", "", "果物", "000", 45, 0.7, 0.1, 11, 1, 0, 0, 0, "生", "11221311", ""],
+ ["牛丼(並)", "牛丼", "丼", "110", 650, 20, 23, 90, 2, 3, 0.2, 0, "煮る", "12213111", ""],
+ ["親子丼", "", "丼", "110", 650, 27, 17, 95, 2, 3.5, 0.3, 0, "煮る", "12222121", ""],
+ ["カレーライス", "カレー", "カレー", "110", 700, 15, 20, 110, 4, 3, 1, 0, "煮る", "12322211", ""],
+ ["焼き魚定食", "定食,魚の定食", "定食", "111", 650, 35, 15, 95, 5, 4.5, 1.5, 1.5, "焼く", "22323244", ""],
+ ["唐揚げ定食", "からあげ定食", "定食", "111", 900, 35, 40, 100, 4, 4.5, 1, 1.5, "揚げる", "12313211", ""],
+ ["ハンバーガー", "バーガー", "パン", "110", 300, 13, 13, 30, 1.5, 1.5, 0, 0, "焼く", "12112111", ""],
+ ["フライドポテト(M)", "ポテト", "間食", "000", 400, 5, 20, 50, 4, 1, 0, 0, "揚げる", "11312211", ""],
+ ["サンドイッチ", "", "パン", "110", 300, 11, 15, 30, 2, 1.5, 0.2, 0, "生", "11111111", ""],
+ ["菓子パン", "甘いパン", "パン", "100", 400, 7, 17, 55, 1.5, 0.8, 0, 0, "焼く", "11111111", ""],
+ ["ポテトチップス(1袋)", "ポテチ", "間食", "000", 330, 3, 21, 33, 2.5, 0.6, 0, 0, "揚げる", "11312211", ""],
+ ["チョコレート(半分)", "チョコ", "間食", "000", 140, 2, 8.5, 14, 1, 0, 0, 0, "生", "11111111", ""],
+ ["甘い飲み物(500ml)", "ジュース,炭酸飲料", "間食", "000", 220, 0, 0, 55, 0, 0.1, 0, 0, "生", "11111111", ""],
+ ["寄せ鍋(1人前)", "鍋", "鍋", "011", 300, 25, 10, 15, 4, 4, 2, 2.5, "煮る", "22322222", ""],
+ ["家のごはん(和食)", "家族のごはん,和食", "定食", "111", 650, 28, 18, 90, 5, 3.5, 1.5, 0, "煮る", "22322222", ""],
+ ["家のごはん(洋食)", "洋食", "定食", "111", 750, 28, 28, 90, 4, 3, 1, 0, "焼く", "12222211", ""],
+ ["家のごはん(中華)", "中華", "定食", "111", 750, 25, 28, 95, 4, 4, 1.5, 0, "炒める", "12322211", ""],
+ ["家のごはん(麺)", "家の麺", "麺", "110", 550, 20, 15, 80, 3, 5, 0.5, 3, "煮る", "11212111", ""],
+ ["家のごはん(丼)", "家の丼", "丼", "110", 650, 22, 18, 95, 2, 3, 0.5, 0, "煮る", "12212111", ""],
+ ["豚こまと野菜の炒め丼", "豚こま丼,野菜炒め丼", "丼", "111", 700, 25, 25, 95, 4, 3, 1.5, 0, "炒める", "12334311", ""],
+ ["鶏むね肉と野菜のスープ", "チキンスープ", "汁物", "011", 250, 25, 6, 15, 4, 2, 2, 0, "煮る", "11333311", ""],
+];
+
+/* 常備品(気力ゼロの日の土台) */
+const STARTER_STOCK = [
+ ["rice", "冷凍ごはん", "スーパー"], ["natto", "納豆", "コンビニ"], ["egg", "卵", "コンビニ"], ["brocc", "冷凍ブロッコリー", "スーパー"],
+ ["tuna", "ツナ缶", "コンビニ"], ["tofu", "豆腐", "コンビニ"], ["cutveg", "カット野菜", "コンビニ"], ["yog", "ヨーグルト", "コンビニ"],
+ ["banana", "バナナ", "コンビニ"], ["miso", "インスタント味噌汁", "スーパー"],
+];
+
+/* 場面と気力ごとの案。items は図鑑の名前、 add は「足すなら」の候補 */
+const STARTER_PLANS = [
+ { scene: "fam", effort: [0, 1, 2], title: "家のごはん(和食)", items: ["家のごはん(和食)"], note: "出てきたものを、そのまま記録" },
+ { scene: "fam", effort: [0, 1, 2], title: "家のごはん(洋食)", items: ["家のごはん(洋食)"], note: "" },
+ { scene: "fam", effort: [0, 1, 2], title: "家のごはん(中華)", items: ["家のごはん(中華)"], note: "" },
+ { scene: "fam", effort: [0, 1, 2], title: "家のごはん(麺)", items: ["家のごはん(麺)"], note: "副菜が足りなくなりやすい" },
+ { scene: "fam", effort: [0, 1, 2], title: "家のごはん(丼)", items: ["家のごはん(丼)"], note: "副菜が足りなくなりやすい" },
+ { scene: "self", effort: [0], title: "冷凍ごはん+納豆+卵+ブロッコリー", items: ["ごはん(茶碗1杯)", "納豆(1パック)", "ゆで卵", "ブロッコリー"], ings: ["冷凍ごはん", "納豆", "卵", "冷凍ブロッコリー"], note: "並べてレンジ。材料も気力もない日の土台" },
+ { scene: "self", effort: [0], title: "ごはん+冷ややっこ+インスタント味噌汁+カット野菜", items: ["ごはん(茶碗1杯)", "冷ややっこ", "インスタント味噌汁", "カット野菜(1袋)"], ings: ["冷凍ごはん", "豆腐", "インスタント味噌汁", "カット野菜"], note: "火を使わない" },
+ { scene: "self", effort: [0], title: "トースト+ゆで卵+ヨーグルト+バナナ", items: ["食パン(1枚)", "ゆで卵", "ヨーグルト", "バナナ"], ings: ["食パン", "卵", "ヨーグルト", "バナナ"], note: "朝に" },
+ { scene: "self", effort: [1], title: "豚こまと野菜の炒め丼", items: ["豚こまと野菜の炒め丼"], ings: ["豚こま肉", "カット野菜", "冷凍ごはん", "焼肉のたれ"], note: "5分。カット野菜を使えば包丁いらず" },
+ { scene: "self", effort: [1], title: "ごはん+目玉焼き+ツナとカット野菜のサラダ", items: ["ごはん(茶碗1杯)", "目玉焼き(卵1個)", "ツナ缶", "カット野菜(1袋)"], ings: ["冷凍ごはん", "卵", "ツナ缶", "カット野菜"], note: "" },
+ { scene: "self", effort: [2], title: "鶏むね肉と野菜のスープ+ごはん", items: ["鶏むね肉と野菜のスープ", "ごはん(茶碗1杯)"], ings: ["鶏むね肉", "玉ねぎ", "にんじん", "キャベツ", "コンソメ", "冷凍ごはん"], note: "作り置きにもなる" },
+ { scene: "self", effort: [2], title: "鮭の塩焼き+ごはん+具だくさん味噌汁+おひたし", items: ["鮭の塩焼き", "ごはん(茶碗1杯)", "具だくさん味噌汁", "ほうれん草のおひたし"], ings: ["塩鮭", "ほうれん草", "豆腐", "わかめ", "味噌", "冷凍ごはん"], note: "" },
+ { scene: "out", effort: [0, 1, 2], title: "焼き魚定食", items: ["焼き魚定食"], note: "迷ったら定食" },
+ { scene: "out", effort: [0, 1, 2], title: "牛丼+サラダ+味噌汁", items: ["牛丼(並)", "カップのサラダ", "インスタント味噌汁"], note: "丼なら足す" },
+ { scene: "out", effort: [0, 1, 2], title: "ラーメン(汁は残す)", items: ["しょうゆラーメン"], note: "汁を残すと塩分が減る", soup: "left" },
+ { scene: "out", effort: [0, 1, 2], title: "ざるそば+ゆで卵", items: ["ざるそば", "ゆで卵"], note: "" },
+ { scene: "buy", effort: [0, 1, 2], title: "おにぎり+ゆで卵+カップのサラダ", items: ["おにぎり(鮭)", "ゆで卵", "カップのサラダ"], note: "手に取るだけ" },
+ { scene: "buy", effort: [0, 1, 2], title: "おにぎり+サラダチキン+具だくさん味噌汁", items: ["おにぎり(鮭)", "サラダチキン", "具だくさん味噌汁"], note: "温かくて満足しやすい" },
+ { scene: "buy", effort: [0, 1, 2], title: "サンドイッチ+ヨーグルト+バナナ", items: ["サンドイッチ", "ヨーグルト", "バナナ"], note: "" },
+];
+const ADDONS = ["納豆(1パック)", "ゆで卵", "ミニトマト(5個)", "具だくさん味噌汁", "ヨーグルト", "ブロッコリー", "カップのサラダ"];
+
+/* 材料:[名前, 買う店, 傷みやすい(1), 常備品のid] */
+const INGREDIENTS = [
+ ["冷凍ごはん", "スーパー", 0, "rice"], ["納豆", "コンビニ", 0, "natto"], ["卵", "コンビニ", 0, "egg"], ["冷凍ブロッコリー", "スーパー", 0, "brocc"], ["ツナ缶", "コンビニ", 0, "tuna"],
+ ["豆腐", "コンビニ", 1, "tofu"], ["カット野菜", "コンビニ", 1, "cutveg"], ["ヨーグルト", "コンビニ", 0, "yog"], ["バナナ", "コンビニ", 1, "banana"], ["インスタント味噌汁", "スーパー", 0, "miso"],
+ ["食パン", "コンビニ", 0, ""], ["豚こま肉", "スーパー", 1, ""], ["焼肉のたれ", "スーパー", 0, ""], ["鶏むね肉", "スーパー", 1, ""], ["玉ねぎ", "スーパー", 0, ""], ["にんじん", "スーパー", 0, ""],
+ ["キャベツ", "スーパー", 1, ""], ["コンソメ", "スーパー", 0, ""], ["塩鮭", "スーパー", 1, ""], ["ほうれん草", "スーパー", 1, ""], ["わかめ", "スーパー", 0, ""], ["味噌", "スーパー", 0, ""],
+];
+
+/* 作り方(1人分)。steps は [手順, タイマーの秒数(なければ0)] */
+const STARTER_RECIPES = {
+ "豚こまと野菜の炒め丼": { time: "10分", ings: [["豚こま肉", "100g"], ["カット野菜", "1袋(約150g)"], ["冷凍ごはん", "茶碗1杯分"], ["焼肉のたれ", "大さじ2"], ["サラダ油", "小さじ1"]], steps: [
+   ["冷凍ごはんを、袋の表示どおりにレンジで温める(600Wで約3分)。", 180], ["フライパンに油を入れて中火で温め、豚こま肉を広げて入れる。", 0], ["肉の色が変わるまで、ほぐしながら炒める。", 120],
+   ["カット野菜を入れて、しんなりするまで炒める。", 120], ["焼肉のたれを回し入れ、全体にからめて火を止める。", 0], ["ごはんにのせてできあがり。", 0]] },
+ "鶏むね肉と野菜のスープ": { time: "20分", ings: [["鶏むね肉", "100g"], ["玉ねぎ", "1/4個"], ["にんじん", "1/4本"], ["キャベツ", "1枚(約50g)"], ["水", "300ml"], ["コンソメ(顆粒)", "小さじ1"], ["塩・こしょう", "少々"]], steps: [
+   ["鶏むね肉をひと口大に切る。玉ねぎは薄切り、にんじんは薄いいちょう切り、キャベツはざく切りにする。", 0], ["鍋に水・にんじん・玉ねぎを入れて中火にかけ、沸騰させる。", 0],
+   ["沸騰したら鶏肉とコンソメを入れ、弱めの中火で煮る。アクが出たら取る。", 480], ["キャベツを入れて、さらに煮る。", 180],
+   ["鶏肉を1つ切って、中まで白くなっているか確かめる。赤いところがあれば、もう少し煮る。", 0], ["塩・こしょうで味をととのえてできあがり。多めに作れば次の日も食べられる。", 0]] },
+ "鮭の塩焼き": { time: "12分", ings: [["塩鮭", "1切れ"], ["クッキングシート", "フライパンに敷く分"]], steps: [
+   ["フライパンにクッキングシートを敷き、鮭を皮を下にして置く。", 0], ["ふたをして中火で焼く。", 300], ["裏返して、ふたをしてさらに焼く。", 240],
+   ["身のいちばん厚いところを箸で割って、中まで色が変わっていればできあがり。", 0]] },
+ "具だくさん味噌汁": { time: "10分", ings: [["水", "200ml"], ["和風だし(顆粒)", "小さじ1/2"], ["豆腐", "1/4丁(約75g)"], ["わかめ(乾燥)", "小さじ1"], ["味噌", "大さじ1"]], steps: [
+   ["鍋に水とだしを入れて中火にかける。", 0], ["待つ間に、豆腐をさいの目に切る。", 0], ["沸いたら豆腐とわかめを入れて煮る。", 60],
+   ["火を弱めて、味噌を溶き入れる。煮立つ前に火を止めてできあがり。", 0]] },
+ "ほうれん草のおひたし": { time: "8分", ings: [["ほうれん草", "1/3束(約70g)"], ["しょうゆ", "小さじ1"], ["かつお節", "あれば少し"]], steps: [
+   ["鍋に湯をわかす。", 0], ["ほうれん草を根元から入れてゆでる。", 60], ["冷たい水にとって冷まし、水けをしぼる。", 0], ["4cmくらいに切って器に盛り、しょうゆ(とかつお節)をかけてできあがり。", 0]] },
+ "目玉焼き(卵1個)": { time: "5分", ings: [["卵", "1個"], ["サラダ油", "小さじ1/2"], ["水", "大さじ1"]], steps: [
+   ["フライパンに油をひいて、中火で温める。", 0], ["卵を割り入れる。", 0], ["白身のふちが白くなったら水を入れ、ふたをして弱火で焼く(半熟の目安)。", 120], ["好みの固さになったら、皿に移してできあがり。", 0]] },
+ "ゆで卵": { time: "12分", ings: [["卵", "1個"], ["水", "卵がかぶるくらい"]], steps: [
+   ["鍋に卵と、卵がかぶるくらいの水を入れて中火にかける。", 0], ["沸騰したら弱めの中火にしてゆでる(固ゆで。半熟なら7分)。", 600], ["冷たい水にとって冷まし、殻をむいてできあがり。", 0]] },
+ "ブロッコリー": { time: "3分", ings: [["冷凍ブロッコリー", "70g"]], steps: [
+   ["耐熱皿に入れて、ふんわりラップをかける。", 0], ["600Wのレンジで温める。", 90], ["好みで、しょうゆやマヨネーズを少しかけてできあがり。", 0]] },
+ "冷ややっこ": { time: "2分", ings: [["豆腐", "1/2丁(約150g)"], ["しょうゆ", "小さじ1"], ["ねぎ・かつお節", "あれば"]], steps: [
+   ["豆腐の水けを切って、器に盛る。", 0], ["しょうゆ(とねぎ・かつお節)をかけてできあがり。", 0]] },
+ "野菜炒め": { time: "8分", ings: [["カット野菜", "1袋(約150g)"], ["サラダ油", "小さじ1"], ["しょうゆ", "小さじ1"], ["塩・こしょう", "少々"]], steps: [
+   ["フライパンに油を入れて、中火から強めの中火で温める。", 0], ["カット野菜を入れて炒める。", 120], ["塩・こしょう・しょうゆで味をととのえてできあがり。", 0]] },
+};
+
+</script>
+<script>
+"use strict";
+const APP_VERSION = "2026-10-27 m9";
+const KEY = "shokutaku-data";
+const MICRO = ["カルシウム", "鉄", "カリウム", "ビタミンA", "ビタミンB群", "ビタミンC", "ビタミンD", "オメガ3"];
+const LVFRAC = [0, 0.05, 0.17, 0.37, 0.6];        // 段階 → 1日に必要な量に対して1人前でどれくらいか
+const LVNAME = ["", "少ない", "ふつう", "多い", "とても多い"];
+const COOK = ["生", "蒸す", "煮る", "焼く", "炒める", "揚げる"];
+const COOKFAT = { 生: 0, 蒸す: 0, 煮る: 0, 焼く: 3, 炒める: 6, 揚げる: 12 };   // 作り方による脂質のちがい(g)
+const QTY = [["少なめ", 0.7], ["ふつう", 1], ["多め", 1.4]];
+const TYPES = ["主食", "主菜", "副菜", "汁物", "定食", "丼", "麺", "カレー", "パン", "おにぎり", "鍋", "卵", "大豆", "乳製品", "果物", "間食", "その他"];
+const TYPE_SHAPE = { 主食: "100", 主菜: "010", 副菜: "001", 汁物: "001", 定食: "111", 丼: "110", 麺: "100", カレー: "110", パン: "100", おにぎり: "100", 鍋: "011", 卵: "010", 大豆: "010", 乳製品: "000", 果物: "000", 間食: "000", その他: "000" };
+const SCENES = [["fam", "家族のごはん"], ["self", "自分で用意"], ["out", "外食"], ["buy", "買う"]];
+const EFFORTS = [["0", "ゼロ"], ["1", "ふつう"], ["2", "ある"]];
+/* 国の食事摂取基準の、推定エネルギー必要量(kcal/日)の目安。[年齢の区切り, 男(低・ふつう・高), 女(低・ふつう・高)] */
+const EER = [[14, [2300, 2600, 2900], [2150, 2400, 2700]], [17, [2500, 2800, 3150], [2050, 2300, 2550]], [29, [2300, 2650, 3050], [1700, 2000, 2300]], [49, [2300, 2700, 3050], [1750, 2050, 2350]], [200, [2200, 2600, 2950], [1650, 1950, 2250]]];
+
+/* ───────── データ ───────── */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const clone = o => JSON.parse(JSON.stringify(o));
+const dayKey = t => { const d = new Date(t); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const today = () => dayKey(Date.now());
+const daysBack = n => { const out = []; for (let i = n - 1; i >= 0; i--) out.push(dayKey(Date.now() - i * 864e5)); return out; };
+const md = k => (+k.slice(5, 7)) + "/" + (+k.slice(8, 10));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const r1 = x => Math.round(x * 10) / 10;
+
+function attachRecipes(x){ x.foods.forEach(f => { if (!f.recipe && STARTER_RECIPES[f.name]) f.recipe = clone(STARTER_RECIPES[f.name]); }); return x; }
+function foodFromRow(r){ return { id: "f" + uid(), name: r[0], alias: r[1] ? r[1].split(",") : [], type: r[2], shape: r[3], kcal: r[4], p: r[5], f: r[6], c: r[7], fib: r[8], salt: r[9], veg: r[10], soupSalt: r[11], cook: r[12], micro: r[13].split("").map(Number), stock: r[14] || "", src: "？", builtin: true }; }
+function blank(){
+  return { v: 1, foods: STARTER_FOODS.map(foodFromRow), plans: STARTER_PLANS, stock: STARTER_STOCK.map(([id, name, shop]) => ({ id, name, shop, st: 0 })),
+    logs: [], memo: [], weights: {}, cookPlan: [], shop: [], ingInfo: [], settings: { sex: "m", age: 17, act: 1, goal: "keep", weighCond: "朝、起きてトイレのあと" }, focus: null, lastReview: null };
+}
+let D = load();
+function load(){ try { const x = JSON.parse(localStorage.getItem(KEY) || "null"); if (x && x.v) return attachRecipes(Object.assign(blank(), x)); } catch (e) {} return attachRecipes(blank()); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast("保存できませんでした(端末の空きを確かめてください)"); } scheduleSync(); }
+
+const norm = s => String(s || "").normalize("NFKC").toLowerCase().replace(/[\s・()()]/g, "").replace(/[ァ-ン]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const byName = n => { const k = norm(n); return D.foods.find(f => norm(f.name) === k || (f.alias || []).some(a => norm(a) === k)); };
+const foodById = id => D.foods.find(f => f.id === id);
+
+/* ───────── 栄養の計算 ───────── */
+function itemNut(it){
+  const f = it.foodId && foodById(it.foodId); if (!f) return null;
+  const q = it.qty || 1, df = it.cook && it.cook !== f.cook ? (COOKFAT[it.cook] || 0) - (COOKFAT[f.cook] || 0) : 0;
+  const salt = Math.max(0, f.salt - (it.soup === "left" ? (f.soupSalt || 0) * 0.7 : 0));
+  return { kcal: Math.max(0, (f.kcal + 9 * df) * q), p: f.p * q, f: Math.max(0, (f.f + df) * q), c: f.c * q, fib: f.fib * q, salt: salt * q, veg: (f.veg || 0) * q,
+    micro: f.micro.map(l => LVFRAC[l] * q), shape: f.shape };
+}
+function dayTotal(k){
+  const t = { kcal: 0, p: 0, f: 0, c: 0, fib: 0, salt: 0, veg: 0, micro: MICRO.map(() => 0), shape: [0, 0, 0], meals: 0, pending: 0 };
+  D.logs.filter(l => l.day === k).forEach(l => { t.meals++; l.items.forEach(it => { const n = itemNut(it); if (!n) { t.pending++; return; }
+    ["kcal", "p", "f", "c", "fib", "salt", "veg"].forEach(x => t[x] += n[x]); n.micro.forEach((v, i) => t.micro[i] += v); }); });
+  D.logs.filter(l => l.day === k).forEach(l => { const s = [0, 0, 0]; l.items.forEach(it => { const f = it.foodId && foodById(it.foodId); const sh = f ? f.shape : (TYPE_SHAPE[it.type] || "000"); for (let i = 0; i < 3; i++) if (sh[i] === "1") s[i] = 1; }); for (let i = 0; i < 3; i++) t.shape[i] += s[i]; });
+  return t;
+}
+function targets(){
+  const s = D.settings, row = EER.find(r => s.age <= r[0]) || EER[EER.length - 1], base = row[s.sex === "f" ? 2 : 1][s.act];
+  const shift = s.goal === "up" ? 200 : s.goal === "down" ? -200 : 0, E = base + shift;
+  const young = s.age < 18;
+  return { E, kcal: [E * 0.9, E * 1.1], p: [E * 0.13 / 4, E * 0.2 / 4], f: [E * 0.2 / 9, E * 0.3 / 9], c: [E * 0.5 / 4, E * 0.65 / 4],
+    fib: [s.sex === "f" ? 18 : (young ? 19 : 21), Infinity], salt: [0, s.sex === "f" ? 6.5 : 7.5], veg: [5, Infinity] };
+}
+function week(){
+  const ks = daysBack(8).slice(0, 7), tots = ks.map(dayTotal), used = tots.filter(t => t.meals > 0), n = used.length || 1;
+  const avg = {}; ["kcal", "p", "f", "c", "fib", "salt", "veg"].forEach(x => avg[x] = used.reduce((a, t) => a + t[x], 0) / n);
+  const micro = MICRO.map((_, i) => used.reduce((a, t) => a + t.micro[i], 0) / n);
+  return { avg, micro, days: used.length, pending: tots.reduce((a, t) => a + t.pending, 0) };
+}
+const SIG = [["kcal", "エネルギー", "kcal"], ["p", "たんぱく質", "g"], ["f", "脂質", "g"], ["c", "炭水化物", "g"], ["fib", "食物繊維", "g"], ["salt", "塩分", "g"], ["veg", "野菜", "皿"]];
+function judge(v, [lo, hi]){
+  if (v < lo) return { k: v < lo * 0.8 ? "bad" : "mid", t: "少なめ", dir: -1 };
+  if (v > hi) return { k: v > hi * 1.2 ? "bad" : "mid", t: "多め", dir: 1 };
+  return { k: "ok", t: "ちょうど", dir: 0 };
+}
+function signals(){
+  const w = week(), T = targets(), out = {};
+  SIG.forEach(([k]) => out[k] = judge(w.avg[k], T[k]));
+  const micro = w.micro.map(v => ({ v, k: v >= 0.8 ? "ok" : v >= 0.5 ? "mid" : "bad", t: v >= 0.8 ? "足りている" : v >= 0.5 ? "不足ぎみ" : "不足" }));
+  return { w, T, out, micro };
+}
+
+/* ───────── 当たり ───────── */
+function satOf(foodName){ const xs = D.logs.filter(l => l.sat && l.items.some(it => it.name === foodName)).map(l => l.sat); return xs.length ? { avg: xs.reduce((a, b) => a + b, 0) / xs.length, n: xs.length } : null; }
+const isHit = name => { const s = satOf(name); return s && s.n >= 2 && s.avg >= 2.5; };
+
+/* ───────── 案を出す ───────── */
+function planScore(pl, sig){
+  let sc = 0; const why = [];
+  const foods = pl.items.map(byName).filter(Boolean); if (!foods.length) return { sc: -99, why, miss: [] };
+  const sum = k => foods.reduce((a, f) => a + (f[k] || 0), 0);
+  const o = sig.out, focus = D.focus, wgt = k => (focus === k ? 2 : 1), noData = !sig.w.days;
+  if (noData) { if (pl.items.some(isHit)) { sc += 3; why.push("当たり"); } const miss0 = foods.filter(f => f.stock && (D.stock.find(s => s.id === f.stock) || {}).st === 2).map(f => (D.stock.find(s => s.id === f.stock) || {}).name); if (pl.scene === "self" && miss0.length) sc -= 10; return { sc, why, miss: miss0 }; }
+  if (o.veg.dir < 0 && sum("veg") >= 1) { sc += 2 * wgt("veg"); why.push("野菜が補える"); }
+  if (o.p.dir < 0 && sum("p") >= 20) { sc += 2 * wgt("p"); why.push("たんぱく質が補える"); }
+  if (o.fib.dir < 0 && sum("fib") >= 4) { sc += 1 * wgt("fib"); why.push("食物繊維が補える"); }
+  if (o.f.dir > 0) { if (sum("f") <= 15) { sc += 2 * wgt("f"); why.push("脂質がひかえめ"); } else if (sum("f") > 25) sc -= 2 * wgt("f"); }
+  if (o.salt.dir > 0) { if (sum("salt") <= 2.5) { sc += 1 * wgt("salt"); why.push("塩分がひかえめ"); } else if (sum("salt") > 4) sc -= 1 * wgt("salt"); }
+  sig.micro.forEach((m, i) => { if (m.k !== "ok" && foods.some(f => f.micro[i] >= 3)) { sc += (focus === "m" + i ? 2 : 1); if (why.length < 3) why.push(MICRO[i] + "が補える"); } });
+  if (pl.items.some(isHit)) { sc += 3; why.unshift("当たり"); }
+  const miss = foods.filter(f => f.stock && (D.stock.find(s => s.id === f.stock) || {}).st === 2).map(f => (D.stock.find(s => s.id === f.stock) || {}).name);
+  if (pl.scene === "self" && miss.length) sc -= 10;
+  return { sc, why: why.slice(0, 3), miss };
+}
+
+/* ───────── GitHubに保存する ─────────
+   端末に先に保存し、裏で送る。前回そろえたときの中身(base)と比べて、
+   こちらで変えた物だけを向こうの最新に当てる(1件ずつ見比べる)ので、2台で記録しても消し合わない */
+const CONF_KEY = "shokutaku-conf", BASE_KEY = "shokutaku-base";
+let conf = (() => { try { return JSON.parse(localStorage.getItem(CONF_KEY) || "null"); } catch (e) { return null; } })();
+let base = (() => { try { return JSON.parse(localStorage.getItem(BASE_KEY) || "null"); } catch (e) { return null; } })();
+let sync = { state: conf ? "待機" : "未接続", at: null, err: "" }, syncTimer = null, syncing = false, again = false;
+
+const b64e = str => { const by = new TextEncoder().encode(str); let bin = ""; for (let i = 0; i < by.length; i += 0x8000) bin += String.fromCharCode.apply(null, by.subarray(i, i + 0x8000)); return btoa(bin); };
+const b64d = b => new TextDecoder().decode(Uint8Array.from(atob(String(b).replace(/\s/g, "")), c => c.charCodeAt(0)));
+async function gh(method, body){
+  const url = "https://api.github.com/repos/" + conf.repo + "/contents/" + conf.path.split("/").map(encodeURIComponent).join("/") + (method === "GET" ? "?ref=" + encodeURIComponent(conf.branch || "main") + "&t=" + Date.now() : "");
+  let r; try { r = await fetch(url, { method, cache: "no-store", headers: { Authorization: "Bearer " + conf.token, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined }); }
+  catch (e) { throw new Error("ネットにつながっていない(電波を確かめてください)"); }
+  return r;
+}
+function ghErr(r){
+  if (r.status === 401) return "鍵(トークン)が正しくないか、期限が切れている";
+  if (r.status === 403) return "鍵に、このリポジトリへの書き込み(Contents: Read and write)が許されていない";
+  if (r.status === 404) return "リポジトリかブランチが見つからない、またはこの鍵では見られない";
+  if (r.status >= 500) return "GitHubが不調(しばらくしてもう一度)";
+  return "GitHubとの通信に失敗した(" + r.status + ")";
+}
+const KEYS = { ingInfo: x => x.name, logs: x => x.id, memo: x => norm(x.name), stock: x => x.id, foods: x => norm(x.name), cookPlan: x => x.id, shop: x => x.name, plans: x => x.scene + "|" + x.title };
+function mergeArr(b, l, r, key){
+  const B = new Map((b || []).map(x => [key(x), x])), L = new Map((l || []).map(x => [key(x), x])), out = new Map((r || []).map(x => [key(x), x]));
+  B.forEach((v, k) => { if (!L.has(k)) out.delete(k); });
+  L.forEach((v, k) => { const bv = B.get(k); if (!bv || JSON.stringify(bv) !== JSON.stringify(v)) out.set(k, v); });
+  return [...out.values()];
+}
+function mergeObj(b, l, r){ b = b || {}; l = l || {}; const out = Object.assign({}, r || {});
+  Object.keys(b).forEach(k => { if (!(k in l)) delete out[k]; }); Object.keys(l).forEach(k => { if (JSON.stringify(b[k]) !== JSON.stringify(l[k])) out[k] = l[k]; }); return out; }
+function merge3(b, l, r){
+  b = b || {}; const out = Object.assign({}, r);
+  new Set(Object.keys(l).concat(Object.keys(r))).forEach(k => {
+    if (KEYS[k]) out[k] = mergeArr(b[k], l[k], r[k], KEYS[k]);
+    else if (k === "weights" || k === "settings") out[k] = mergeObj(b[k], l[k], r[k]);
+    else if (JSON.stringify(b[k]) !== JSON.stringify(l[k])) out[k] = l[k];
+  });
+  return out;
+}
+function repairRefs(x){   // 2台で同じ料理を入れたとき、記録の指す先を名前でつなぎ直す
+  const ids = new Set(x.foods.map(f => f.id));
+  x.logs.forEach(l => l.items.forEach(it => { if (it.foodId && !ids.has(it.foodId)) { const k = norm(it.name), f = x.foods.find(g => norm(g.name) === k || (g.alias || []).some(a => norm(a) === k)); it.foodId = f ? f.id : null; } }));
+  return x;
+}
+function setBase(sha, data){ base = { sha, data: clone(data) }; try { localStorage.setItem(BASE_KEY, JSON.stringify(base)); } catch (e) {} }
+function scheduleSync(){ if (!conf) return; clearTimeout(syncTimer); syncTimer = setTimeout(runSync, 1200); }
+async function runSync(){
+  if (!conf) return; if (syncing) { again = true; return; }
+  syncing = true; sync.state = "送信中"; sync.err = ""; paintSync();
+  try {
+    for (let i = 0; i < 4; i++) {
+      const r = await gh("GET");
+      let remote = null, sha = null;
+      if (r.status === 404) { const chk = await fetch("https://api.github.com/repos/" + conf.repo, { headers: { Authorization: "Bearer " + conf.token }, cache: "no-store" }).catch(() => null);
+        if (!chk || !chk.ok) throw new Error(chk ? ghErr(chk) : "ネットにつながっていない(電波を確かめてください)"); }
+      else if (!r.ok) throw new Error(ghErr(r));
+      else { const j = await r.json(); sha = j.sha; remote = JSON.parse(b64d(j.content)); }
+      if (remote) {
+        if (!base || base.sha !== sha) { const merged = repairRefs(Object.assign(blank(), merge3(base && base.data, D, remote))); D = merged; localStorage.setItem(KEY, JSON.stringify(D)); }
+        if (JSON.stringify(D) === JSON.stringify(remote)) { setBase(sha, remote); break; }
+      }
+      const put = await gh("PUT", { message: "食卓 " + new Date().toLocaleString("ja-JP"), content: b64e(JSON.stringify(D)), branch: conf.branch || "main", ...(sha ? { sha } : {}) });
+      if (put.ok) { const j = await put.json(); setBase(j.content.sha, D); break; }
+      if (put.status === 409 || put.status === 422) continue;   // その間に別の端末が書いた → 読み直してまとめ直す
+      throw new Error(ghErr(put));
+    }
+    sync.state = "同期済み"; sync.at = Date.now();
+  } catch (e) { sync.state = "失敗"; sync.err = e.message; }
+  syncing = false; render();
+  if (again) { again = false; scheduleSync(); }
+}
+function paintSync(){ const el = document.getElementById("sync-line"); if (el) el.innerHTML = syncLine(); }
+function syncLine(){
+  if (!conf) return "";
+  const t = sync.at ? new Date(sync.at).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) : "";
+  return sync.state === "失敗" ? '<span style="color:var(--bad)">GitHubに送れていません:' + esc(sync.err) + '</span> <button class="linkx" data-sync-now>もう一度</button>'
+    : '<span class="note">' + (sync.state === "同期済み" ? "GitHubと同期済み " + t : sync.state === "送信中" ? "GitHubと同期中…" : "GitHubとつながっています") + "</span>";
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") scheduleSync(); });
+setInterval(() => { if (document.visibilityState === "visible" && conf && !syncing) runSync(); }, 120000);
+
+/* ───────── 画面 ───────── */
+let tab = "now", scene = "fam", effort = "1", sheet = null, bookQ = "", importPrev = null;
+const $ = id => document.getElementById(id);
+function toast(t){ const el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); }
+function shapeTags(sh){ return ["主食", "主菜", "副菜"].map((n, i) => sh[i] === "1" ? '<span class="tag ' + "smd"[i] + '">' + n + "</span>" : "").join(""); }
+const plansHere = () => D.plans.filter(p => p.scene === scene && p.effort.includes(+effort));
+
+function plateSvg(sh, meals){
+  const R = 46, cx = 56, cy = 56, seg = (i, on) => { const a0 = -90 + i * 120 + 4, a1 = a0 + 112, rad = a => a * Math.PI / 180;
+    const p = (a, r) => [cx + r * Math.cos(rad(a)), cy + r * Math.sin(rad(a))]; const [x0, y0] = p(a0, R), [x1, y1] = p(a1, R), [x2, y2] = p(a1, R - 14), [x3, y3] = p(a0, R - 14);
+    return '<path d="M' + x0 + " " + y0 + " A" + R + " " + R + " 0 0 1 " + x1 + " " + y1 + " L" + x2 + " " + y2 + " A" + (R - 14) + " " + (R - 14) + " 0 0 0 " + x3 + " " + y3 + 'Z" fill="var(--' + ["staple", "main", "side"][i] + ')" opacity="' + on + '"/>'; };
+  const op = i => meals ? Math.max(0.15, Math.min(1, sh[i] / Math.max(meals, 1))) : 0.15;
+  return '<svg width="112" height="112" viewBox="0 0 112 112" role="img" aria-label="今日の皿:主食' + sh[0] + "回・主菜" + sh[1] + "回・副菜" + sh[2] + '回"><circle cx="56" cy="56" r="54" fill="var(--card)" stroke="var(--line)"/>' + [0, 1, 2].map(i => seg(i, op(i))).join("") +
+    '<text x="56" y="54" text-anchor="middle" font-size="20" font-weight="700" fill="var(--ink)">' + meals + '</text><text x="56" y="72" text-anchor="middle" font-size="11" fill="var(--sub)">食</text></svg>';
+}
+
+function nowView(){
+  const sig = signals(), t = dayTotal(today()), ps = plansHere().map(p => Object.assign({}, p, planScore(p, sig))).sort((a, b) => b.sc - a.sc);
+  const memoN = D.memo.length;
+  return '<h1>食卓</h1>' + (conf ? '<div id="sync-line" style="margin:-.5rem 0 .4rem">' + syncLine() + "</div>" : "") +
+    '<div class="card plate-wrap">' + plateSvg(t.shape, t.meals) + '<div><div style="font-weight:700">今日の皿</div>' +
+      '<div class="row" style="margin:.3rem 0"><span class="tag s">主食 ' + t.shape[0] + '</span><span class="tag m">主菜 ' + t.shape[1] + '</span><span class="tag d">副菜 ' + t.shape[2] + "</span></div>" +
+      '<p class="note">' + (t.meals ? "記録した食事 " + t.meals + "回" : "まだ記録していない") + (D.focus ? " ・ 今週気をつけること:" + esc(focusLabel(D.focus)) : "") + "</p></div></div>" +
+    reviewCard() +
+    "<h2>どこから食べる?</h2><div class=\"row\" role=\"group\" aria-label=\"どこから食べる\">" + SCENES.map(([k, l]) => '<button class="chip" data-scene="' + k + '" aria-pressed="' + (scene === k) + '">' + l + "</button>").join("") + "</div>" +
+    (scene === "self" ? "<h2>今の気力は?</h2><div class=\"row\" role=\"group\" aria-label=\"今の気力\">" + EFFORTS.map(([k, l]) => '<button class="chip" data-effort="' + k + '" aria-pressed="' + (effort === k) + '">' + l + "</button>").join("") + "</div>" : "") +
+    "<h2>今できる案</h2>" + (ps.length ? ps.map((p, i) => '<button class="plan' + (p.miss.length && p.scene === "self" ? " dim" : "") + '" data-plan="' + D.plans.indexOf(D.plans.find(x => x.title === p.title && x.scene === p.scene)) + '">' +
+      '<div class="row" style="justify-content:space-between"><span class="t">' + esc(p.title) + "</span>" + (p.why[0] === "当たり" ? '<span class="badge">当たり</span>' : "") + "</div>" +
+      (p.note ? '<div class="note">' + esc(p.note) + "</div>" : "") +
+      '<div class="row" style="margin-top:.35rem">' + shapeTags(combineShape(p.items)) + p.why.filter(w => w !== "当たり").map(w => '<span class="badge why">' + esc(w) + "</span>").join("") + p.miss.map(m => '<span class="badge miss">' + esc(m) + "がない</span>").join("") + "</div></button>" +
+      (p.scene === "self" && p.items.some(hasRecipe) ? '<button class="linkx" data-recipe="' + esc(p.items.join("|")) + '" style="margin:-.2rem 0 .3rem .4rem">作り方を見る</button>' : "")).join("") : '<p class="note">この場面の案がまだありません。</p>') +
+    '<div class="row" style="margin-top:.8rem"><button class="btn ghost" data-open-free>ほかの物を食べた</button>' + (memoN ? '<button class="linkx" data-tab="book">足りない物メモ ' + memoN + "件</button>" : "") + "</div>";
+}
+function combineShape(names){ const s = [0, 0, 0]; names.map(byName).filter(Boolean).forEach(f => { for (let i = 0; i < 3; i++) if (f.shape[i] === "1") s[i] = 1; }); return s.join(""); }
+
+/* ───────── 振り返り(週に1回) ───────── */
+const FOCUS = [["veg", "野菜を毎日とる"], ["p", "たんぱく質を足す"], ["f", "脂質(揚げ物)をひかえる"], ["salt", "塩分をひかえる"], ["fib", "食物繊維を足す"]];
+const focusLabel = k => (FOCUS.find(f => f[0] === k) || [0, k && k[0] === "m" ? MICRO[+k.slice(1)] + "を足す" : ""])[1];
+function reviewCard(){
+  const due = !D.lastReview || (Date.now() - D.lastReview) > 6.5 * 864e5; if (!due || D.logs.length < 3) return "";
+  const sig = signals(), cand = FOCUS.filter(([k]) => sig.out[k] && sig.out[k].k !== "ok").concat(sig.micro.map((m, i) => m.k !== "ok" ? ["m" + i, MICRO[i] + "を足す"] : null).filter(Boolean));
+  const list = (cand.length ? cand : FOCUS).slice(0, 5);
+  return '<div class="card" style="border-color:var(--ai)"><div style="font-weight:700">今週の振り返り</div><p class="note">この7日の信号を見て、次の1週間に気をつけることを1つだけ選ぶ。選んだことは、案の出し方に反映される。</p>' +
+    '<div class="row" style="margin-top:.4rem">' + list.map(([k, l]) => '<button class="chip" data-focus="' + k + '">' + esc(l) + "</button>").join("") + '<button class="linkx" data-focus="">今週はなし</button></div></div>';
+}
+
+/* ───────── 記録のシート ───────── */
+function slotNow(){ const h = new Date().getHours() + new Date().getMinutes() / 60; return h < 10.5 ? "朝" : h < 15.5 ? "昼" : h < 21 ? "夜" : "間食"; }
+function openSheet(items, opt){ sheet = { items: items.map(n => mkItem(n, opt)), slot: slotNow(), q: "", editId: null }; render(); }
+function mkItem(name, opt){ const f = byName(name); return { foodId: f ? f.id : null, name: f ? f.name : name, qty: 1, cook: null, soup: (opt && opt.soup) || null, type: f ? f.type : null }; }
+function sheetView(){
+  const s = sheet, hits = s.q ? D.foods.filter(f => norm(f.name).includes(norm(s.q)) || (f.alias || []).some(a => norm(a).includes(norm(s.q)))).slice(0, 8) : recentFoods().slice(0, 8);
+  return '<div class="sheet-bg" data-close-sheet></div><div class="sheet" role="dialog" aria-label="食べた物を記録">' +
+    '<div class="row" style="justify-content:space-between"><b>' + (s.editId ? "記録を直す" : "食べた物") + '</b><button class="linkx" data-close-sheet>閉じる</button></div>' +
+    '<div class="row" role="group" aria-label="いつ" style="margin:.4rem 0">' + ["朝", "昼", "夜", "間食"].map(x => '<button class="chip" data-slot="' + x + '" aria-pressed="' + (s.slot === x) + '">' + x + "</button>").join("") + "</div>" +
+    (s.items.length ? s.items.map((it, i) => itemRow(it, i)).join("") : '<p class="note">下で探して足す。</p>') +
+    addonRow(s) +
+    '<div style="margin-top:.6rem"><input id="sheet-q" placeholder="料理の名前で探す・足す" value="' + esc(s.q) + '" aria-label="料理の名前"></div>' +
+    '<div class="row" style="margin:.4rem 0">' + hits.map(f => '<button class="chip" data-add="' + esc(f.name) + '">' + esc(f.name) + "</button>").join("") +
+      (s.q && !byName(s.q) ? '<button class="chip" data-add-new="1" style="border-style:dashed">「' + esc(s.q) + '」を名前だけで足す</button>' : "") + "</div>" +
+    (s.items.length ? '<div class="sat-wrap"><p class="note" style="margin:0">満足した?</p><div class="sat"><button data-sat="3">満足</button><button data-sat="2">まあまあ</button><button data-sat="1">物足りない</button></div></div>' : "") +
+    (s.editId ? '<div style="margin-top:.6rem"><button class="linkx" data-del-log>この記録を消す</button></div>' : "") + "</div>";
+}
+function addonRow(s){
+  const sig = signals(), have = new Set(s.items.map(it => it.name)), sh = combineShape(s.items.map(it => it.name));
+  const score = n => { const f = byName(n); if (!f) return -9; let sc = 0;
+    if (sh[2] === "0" && f.shape[2] === "1") sc += 3; if (sh[1] === "0" && f.shape[1] === "1") sc += 3;
+    if (sig.w.days) { if (sig.out.veg.dir < 0 && f.veg) sc += 2; if (sig.out.p.dir < 0 && f.p >= 6) sc += 2; sig.micro.forEach((m, i) => { if (m.k !== "ok" && f.micro[i] >= 3) sc += 1; }); }
+    return sc; };
+  const list = ADDONS.filter(n => !have.has(n) && byName(n)).sort((a, b) => score(b) - score(a)).slice(0, 4);
+  return s.items.length && list.length ? '<p class="note" style="margin-top:.5rem">足すなら' + (sh[2] === "0" ? "(副菜がまだない)" : sh[1] === "0" ? "(主菜がまだない)" : "") + '</p><div class="row">' + list.map(n => '<button class="chip" data-add="' + esc(n) + '">+ ' + esc(n) + "</button>").join("") + "</div>" : "";
+}
+function itemRow(it, i){
+  const f = it.foodId && foodById(it.foodId), canSoup = f && f.soupSalt > 0;
+  return '<div class="item"><div class="row" style="justify-content:space-between"><b>' + esc(it.name) + "</b><span>" + (f && f.recipe ? '<button class="linkx" data-recipe="' + esc(f.name) + '">作り方</button>' : "") + '<button class="linkx" data-rm="' + i + '">外す</button></span></div>' +
+    (f ? '<div class="row" style="margin:.2rem 0">' + shapeTags(f.shape) + "</div>" + nutGrid(itemNut(it)) :
+      '<div class="note">図鑑にないので、名前だけで記録する(足りない物メモに入る)。型が分かれば押す:</div><div class="row" style="margin:.3rem 0">' + ["定食", "丼", "麺", "カレー", "パン", "おにぎり", "主菜", "副菜", "間食", "その他"].map(t => '<button class="chip" data-itype="' + i + '" data-v="' + t + '" aria-pressed="' + (it.type === t) + '">' + t + "</button>").join("") + "</div>") +
+    '<div class="row" style="margin-top:.3rem"><span class="seg" role="group" aria-label="量">' + QTY.map(([l, q]) => '<button data-qty="' + i + '" data-v="' + q + '" aria-pressed="' + (it.qty === q) + '">' + l + "</button>").join("") + "</span>" +
+    (f ? '<select data-cook="' + i + '" aria-label="作り方" style="width:auto;padding:.25rem .5rem;font-size:.82rem">' + COOK.map(c => "<option" + ((it.cook || f.cook) === c ? " selected" : "") + ">" + c + "</option>").join("") + "</select>" : "") +
+    (canSoup ? '<span class="seg" role="group" aria-label="汁">' + [["drank", "汁を飲んだ"], ["left", "汁を残した"]].map(([k, l]) => '<button data-soup="' + i + '" data-v="' + k + '" aria-pressed="' + ((it.soup || "drank") === k) + '">' + l + "</button>").join("") + "</span>" : "") + "</div></div>";
+}
+function nutGrid(n){ return '<div class="ngrid">' + [["kcal", "エネルギー", "kcal"], ["p", "たんぱく質", "g"], ["f", "脂質", "g"], ["c", "炭水化物", "g"], ["salt", "塩分", "g"]].map(([k, l, u]) => "<div><b>" + fmt(n[k], u) + "</b>" + l + "</div>").join("") + "</div>"; }
+function recentFoods(){ const seen = new Set(), out = []; D.logs.slice().reverse().forEach(l => l.items.forEach(it => { const f = it.foodId && foodById(it.foodId); if (f && !seen.has(f.id)) { seen.add(f.id); out.push(f); } }));
+  D.foods.forEach(f => { if (!seen.has(f.id) && out.length < 12) { seen.add(f.id); out.push(f); } }); return out; }
+function saveMeal(sat){
+  const s = sheet; if (!s.items.length) return;
+  const rec = { id: s.editId || uid(), t: Date.now(), day: today(), slot: s.slot, items: s.items.map(it => ({ foodId: it.foodId, name: it.name, qty: it.qty, cook: it.cook, soup: it.soup, type: it.type })), sat };
+  if (s.editId) { const old = D.logs.find(l => l.id === s.editId); rec.t = old.t; rec.day = old.day; D.logs = D.logs.map(l => l.id === s.editId ? rec : l); }
+  else { D.logs.push(rec); const names = rec.items.map(it => it.name).join("|"); D.cookPlan = D.cookPlan.filter(cp => cp.items.join("|") !== names && !cp.items.every(n => rec.items.some(it => it.name === n))); }
+  rec.items.forEach(it => { if (!it.foodId && !D.memo.some(m => norm(m.name) === norm(it.name))) D.memo.push({ name: it.name, note: it.type || "", t: Date.now() });
+    const f = it.foodId && foodById(it.foodId), st = f && f.stock && D.stock.find(x => x.id === f.stock); if (st && st.st === 0) st.st = 1; });
+  save(); sheet = null; toast(s.editId ? "直しました" : "記録しました"); render();
+}
+
+/* ───────── 記録の画面 ───────── */
+const fmt = (v, u) => u === "kcal" ? Math.round(v) : r1(v);
+function rngText(rng, unit, k){
+  const fmt = (v, u) => k === "salt" ? r1(v) : Math.round(v);
+  if (!isFinite(rng[1])) return "目安 " + fmt(rng[0], unit) + unit + " 以上";
+  if (k === "salt") return "目安 " + fmt(rng[1], unit) + unit + " 未満";
+  return "目安 " + fmt(rng[0], unit) + "〜" + fmt(rng[1], unit) + unit;
+}
+function nutRow(k, label, unit, v, rng, j){
+  const open = !isFinite(rng[1]), max = Math.max(open ? rng[0] * 1.25 : rng[1] * 1.25, 1e-9), pct = x => Math.min(100, Math.max(0, x / max * 100));
+  const lo = k === "salt" ? 0 : pct(rng[0]), hi = open ? 100 : pct(rng[1]), over = !open && v > max;
+  const col = !j ? "var(--ai)" : j.k === "ok" ? "var(--ok)" : j.k === "mid" ? "var(--mid)" : "var(--bad)";
+  const excess = !open && v > rng[1] ? '<span class="over-t" style="color:' + col + '"> ・ ' + (unit === "kcal" ? Math.round(v - rng[1]) : r1(v - rng[1])) + unit + " 超えている</span>" : "";
+  const short = j && v < rng[0] ? '<span class="over-t" style="color:' + col + '"> ・ あと ' + (unit === "kcal" ? Math.round(rng[0] - v) : r1(rng[0] - v)) + unit + "</span>" : "";
+  return '<div class="nut"><div class="top"><span class="lab">' + label + '</span><span class="val">' + fmt(v, unit) + '<span class="unit">' + unit + "</span></span>" +
+    (j ? '<span class="pill ' + j.k + '">' + j.t + "</span>" : '<span class="pill na">途中</span>') + "</div>" +
+    '<div class="bar2" role="img" aria-label="' + label + " " + fmt(v, unit) + unit + "、" + rngText(rng, unit, k) + '"><div class="zone' + (open ? " open" : "") + (k === "salt" ? " from0" : "") + '" style="left:' + lo + "%;width:" + (hi - lo) + '%"></div><div class="fill' + (over ? " over" : "") + '" style="width:' + pct(v) + "%;background-color:" + col + '"></div></div>' +
+    '<div class="rng">' + rngText(rng, unit, k) + excess + short + "</div></div>";
+}
+function sigRow(k, label, unit, v, rng, j){
+  const max = Math.max(isFinite(rng[1]) ? rng[1] * 1.6 : rng[0] * 2, v * 1.1, 1), pct = x => Math.min(100, x / max * 100), lo = pct(rng[0]), hi = isFinite(rng[1]) ? pct(rng[1]) : 100;
+  const col = j.k === "ok" ? "var(--ok)" : j.k === "mid" ? "var(--mid)" : "var(--bad)";
+  return '<div class="sig"><span>' + label + '</span><div class="track" title="' + Math.round(v) + unit + '"><div class="zone" style="left:' + lo + "%;width:" + (hi - lo) + '%"></div><div class="dot" style="left:' + pct(v) + "%;background:" + col + '"></div></div><span class="st ' + j.k + '">' + j.t + "</span></div>";
+}
+let showNums = false, logSub = "sig", dayOff = 1;
+function logView(){
+  const tabs = '<div class="row" role="group" aria-label="記録の見方" style="margin-bottom:.4rem">' + [["sig", "信号"], ["day", "日ごと"], ["look", "振り返り"]].map(([k, l]) => '<button class="chip" data-logsub="' + k + '" aria-pressed="' + (logSub === k) + '">' + l + "</button>").join("") + "</div>";
+  return "<h1>記録</h1>" + tabs + (logSub === "day" ? dayView() : logSub === "look" ? lookView() : sigView());
+}
+function sigView(){
+  const sig = signals(), { w, T } = sig, td = today();
+  const todays = D.logs.filter(l => l.day === td).sort((a, b) => a.t - b.t);
+  const past = D.logs.filter(l => l.day !== td).sort((a, b) => b.t - a.t).slice(0, 20);
+  const vitA = w.micro[3] > 2.5;
+  return "" +
+    '<div class="card"><b>この7日の信号(1日あたり)</b>' +
+      '<p class="note">' + (w.days ? "昨日までの7日のうち、記録のある " + w.days + " 日の平均。緑の枠の中に入っていれば、ちょうどいい。" : "1日が終わると、ここに信号が出ます(今日の分は、明日から入る)。") + (w.pending ? " 栄養が入っていない物が " + w.pending + " 件あります(図鑑に入れると埋まる)。" : "") + "</p>" +
+      (w.days ? SIG.map(([k, l, u]) => nutRow(k, l, u, w.avg[k], T[k], sig.out[k])).join("") : "") + "</div>" +
+    (w.days ? '<div class="card"><b>細かい栄養(だいたい・1日あたり)</b><p class="note">料理ごとの4段階を足して、1日に必要な量の何%くらい取れているかを見る。80%を超えていれば足りている。</p>' +
+      MICRO.map((n, i) => { const m = sig.micro[i], col = m.k === "ok" ? "var(--ok)" : m.k === "mid" ? "var(--mid)" : "var(--bad)", pc = Math.round(m.v * 100), w2 = Math.min(100, pc / 1.25);
+        return '<div class="nut"><div class="top"><span class="lab">' + n + '</span><span class="val">約' + pc + '<span class="unit">%</span></span><span class="pill ' + m.k + '">' + m.t + "</span></div>" +
+          '<div class="bar2"><div class="zone open" style="left:' + (80 / 1.25) + '%;width:' + (100 - 80 / 1.25) + '%"></div><div class="fill' + (pc > 125 ? " over" : "") + '" style="width:' + w2 + "%;background-color:" + col + '"></div></div><div class="rng">目安 80%以上' + (pc < 80 ? '<span class="over-t" style="color:' + col + '"> ・ あと ' + (80 - pc) + "%</span>" : "") + "</div></div>"; }).join("") +
+      (vitA ? '<p class="note" style="color:var(--mid)">ビタミンAがとても多い日が続いています。レバーなどを続けて食べていないか確かめてください。</p>' : "") + "</div>" : "") +
+    todayCard(T) +
+    "<h2>今日</h2>" + (todays.length ? todays.map(logCard).join("") : '<p class="note">まだありません。「いま」から記録できます。</p>') +
+    (past.length ? "<h2>これまで</h2>" + past.map(logCard).join("") : "");
+}
+function mealHealth(l){
+  const s = [0, 0, 0]; let veg = 0, salt = 0, fat = 0, kcal = 0, known = 0;
+  l.items.forEach(it => { const f = it.foodId && foodById(it.foodId), sh = f ? f.shape : (TYPE_SHAPE[it.type] || "000"); for (let i = 0; i < 3; i++) if (sh[i] === "1") s[i] = 1;
+    const n = itemNut(it); if (n) { known++; veg += n.veg; salt += n.salt; fat += n.f; kcal += n.kcal; } });
+  let sc = s[0] + s[1] + s[2] + (veg >= 1 ? 1 : 0);
+  if (known) { if (salt > 3.5) sc -= 1; if (kcal && fat * 9 / kcal > 0.35) sc -= 1; }
+  return { sc, good: sc >= 3 };
+}
+const sigOf = l => l.items.map(it => it.name).sort().join("+");
+function dayView(){
+  const k = dayKey(Date.now() - dayOff * 864e5), isToday = dayOff === 0, t = dayTotal(k), T = targets();
+  const meals = D.logs.filter(l => l.day === k).sort((a, b) => a.t - b.t);
+  const sat = meals.filter(l => l.sat).map(l => l.sat), avgSat = sat.length ? sat.reduce((a, b) => a + b, 0) / sat.length : 0;
+  return '<div class="row" style="justify-content:space-between;margin:.3rem 0"><button class="btn ghost sm" data-day="1">前の日</button><b>' + (isToday ? "今日" : md(k)) + '</b><button class="btn ghost sm" data-day="-1"' + (isToday ? " disabled" : "") + ">次の日</button></div>" +
+    '<div class="card plate-wrap">' + plateSvg(t.shape, t.meals) + '<div><div class="row"><span class="tag s">主食 ' + t.shape[0] + '</span><span class="tag m">主菜 ' + t.shape[1] + '</span><span class="tag d">副菜 ' + t.shape[2] + "</span></div>" +
+      '<p class="note" style="margin-top:.3rem">' + (t.meals ? "食事 " + t.meals + "回" + (avgSat ? " ・ 満足 " + ["", "物足りない", "まあまあ", "満足"][Math.round(avgSat)] + "寄り" : "") : "この日の記録はありません") + "</p></div></div>" +
+    (t.meals ? (isToday ? todayCard(T) : '<div class="card"><b>この日の栄養</b>' + (t.pending ? '<p class="note">栄養が入っていない物が ' + t.pending + " 件あります。</p>" : "") +
+      SIG.map(([kk, l, u]) => nutRow(kk, l, u, t[kk], T[kk], judge(t[kk], T[kk]))).join("") + "</div>") : "") +
+    meals.map(logCard).join("");
+}
+function lookView(){
+  const ks = daysBack(8).slice(0, 7), T = targets(), logs = D.logs.filter(l => ks.includes(l.day));
+  if (!logs.length) return '<p class="note">昨日までの7日に記録がありません。記録がたまると、ここで振り返れます。</p>' + focusPicker();
+  const strip = '<div class="card"><b>この7日</b><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;margin-top:.5rem;text-align:center">' + ks.map(k => { const t = dayTotal(k), j = t.meals ? [judge(t.veg, T.veg), judge(t.salt, T.salt), judge(t.f, T.f)] : [];
+      const col = !t.meals ? "var(--line)" : j.every(x => x.k === "ok") ? "var(--ok)" : j.some(x => x.k === "bad") ? "var(--bad)" : "var(--mid)";
+      return '<button class="linkx" data-goday="' + k + '" style="text-decoration:none;padding:0"><div class="note">' + md(k) + '</div><div style="width:1.6rem;height:1.6rem;border-radius:50%;margin:.2rem auto;background:' + col + ';opacity:' + (t.meals ? 1 : .35) + '"></div><div class="note">' + (t.meals ? t.meals + "食" : "—") + "</div></button>"; }).join("") +
+    '</div><p class="note" style="margin-top:.4rem">色は、その日の野菜・塩分・脂質がそろって目安に入っていれば緑。押すとその日を見る。</p></div>';
+  const cnt = new Map(); logs.forEach(l => l.items.forEach(it => cnt.set(it.name, (cnt.get(it.name) || 0) + 1)));
+  const top = [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const groups = { hit: [], fun: [], tweak: [], redo: [] }, seen = new Map();
+  logs.filter(l => l.sat).forEach(l => { const k = sigOf(l); if (!seen.has(k)) seen.set(k, { name: l.items.map(it => it.name).join("+"), sats: [], good: [] }); const g = seen.get(k); g.sats.push(l.sat); g.good.push(mealHealth(l).good); });
+  seen.forEach(g => { const sat = g.sats.reduce((a, b) => a + b, 0) / g.sats.length >= 2.5, good = g.good.filter(Boolean).length >= g.good.length / 2;
+    (sat && good ? groups.hit : sat ? groups.fun : good ? groups.tweak : groups.redo).push(g); });
+  const box = (k, title, note) => groups[k].length ? '<div class="card"><b>' + title + '</b><p class="note">' + note + "</p>" + groups[k].slice(0, 6).map(g => '<div class="list-li"><span>' + esc(g.name) + '</span><span class="note">' + g.sats.length + "回</span></div>").join("") + "</div>" : "";
+  return strip +
+    '<div class="card"><b>よく食べた物</b>' + top.map(([n, c]) => '<div class="list-li"><span>' + esc(n) + '</span><span class="note">' + c + "回</span></div>").join("") + "</div>" +
+    "<h2>満足と健康で分けると</h2>" +
+    box("hit", "当たり", "満足して、形も栄養も整っている。これを増やす。") +
+    box("tweak", "工夫しどころ", "体にはいいけど、満足していない。量や味つけ、温かさ、組み合わせを変えると当たりになるかもしれない。") +
+    box("fun", "楽しみ枠", "満足はしたけど、栄養は偏りぎみ。やめなくていい。副菜を足すなどで寄せられる。") +
+    box("redo", "見直し", "満足もしていないし、栄養も偏りぎみ。別の案に置き換えたい。") +
+    (seen.size ? "" : '<p class="note">満足の度合いを付けた食事がたまると、ここに分けて出ます。</p>') +
+    focusPicker();
+}
+function focusPicker(){
+  const sig = signals(), cand = FOCUS.filter(([k]) => sig.out[k] && sig.out[k].k !== "ok").concat(sig.micro.map((m, i) => m.k !== "ok" ? ["m" + i, MICRO[i] + "を足す"] : null).filter(Boolean));
+  const list = (cand.length ? cand : FOCUS).slice(0, 6);
+  return '<div class="card"><b>次の1週間に気をつけること</b><p class="note">1つだけ選ぶ。選んだことは、案の出し方に反映される。' + (D.focus ? "今は「" + esc(focusLabel(D.focus)) + "」。" : "") + "</p>" +
+    '<div class="row" style="margin-top:.4rem">' + list.map(([k, l]) => '<button class="chip" data-focus="' + k + '" aria-pressed="' + (D.focus === k) + '">' + esc(l) + "</button>").join("") + '<button class="linkx" data-focus="">なし</button></div></div>';
+}
+function todayCard(T){
+  const t = dayTotal(today()); if (!t.meals) return "";
+  return '<div class="card"><b>今日のここまで</b><p class="note">1日の目安に対して、今どこまで来たか。判定はせず、1日が終わると7日の信号に入る。</p>' +
+    SIG.map(([k, l, u]) => nutRow(k, l, u, t[k], T[k], null)).join("") + "</div>";
+}
+function logCard(l){ const sat = ["", "物足りない", "まあまあ", "満足"][l.sat || 0];
+  return '<button class="plan" data-edit-log="' + l.id + '"><div class="row" style="justify-content:space-between"><span class="t">' + (l.day === today() ? "" : md(l.day) + " ") + esc(l.slot) + '</span><span class="note">' + sat + "</span></div>" +
+    '<div class="note">' + l.items.map(it => esc(it.name) + (it.qty !== 1 ? "(" + (it.qty < 1 ? "少なめ" : "多め") + ")" : "") + (it.foodId ? "" : "(栄養まだ)")).join("、") + "</div></button>"; }
+
+/* ───────── 調達(作る予定・買う物・常備品) ───────── */
+const STL = [["ある", "a"], ["少ない", "l"], ["ない", "n"]];
+const ingInfo = n => { const u = (D.ingInfo || []).find(x => x.name === n); if (u) return { name: u.name, shopAt: u.shop || "スーパー", fresh: !!u.fresh, stock: u.stock || "" };
+  const r = INGREDIENTS.find(x => x[0] === n); return r ? { name: r[0], shopAt: r[1], fresh: !!r[2], stock: r[3] } : { name: n, shopAt: "スーパー", fresh: false, stock: "" }; };
+const stockOfIng = n => { const i = ingInfo(n); return i.stock ? D.stock.find(s => s.id === i.stock) : D.stock.find(s => s.name === n); };
+const BASICS = /^(水|お湯|湯|塩|こしょう|塩・こしょう|砂糖|サラダ油|油|しょうゆ|クッキングシート)$/;
+function planIngs(p){ if (p.ings && p.ings.length) return p.ings.slice();
+  const out = []; p.items.forEach(n => { const f = byName(n); (f && f.recipe ? f.recipe.ings : []).forEach(([name]) => { const k = name.replace(/\(.*?\)/g, "").trim(); if (!BASICS.test(k) && !out.includes(name)) out.push(name); }); }); return out; }
+/* 買う物リスト:常備品の不足+作る予定の材料+自分で足した物。同じ物は1つにまとめる */
+function shopList(){
+  const out = new Map(), put = (name, from, extra) => { const k = name; if (!out.has(k)) { const i = ingInfo(name); out.set(k, { name, shopAt: (extra && extra.shopAt) || i.shopAt, fresh: i.fresh, from: [] }); } out.get(k).from.push(from); };
+  D.stock.filter(s => s.st > 0).forEach(s => put(s.name, s.st === 2 ? "常備品(ない)" : "常備品(少ない)", { shopAt: s.shop }));
+  D.cookPlan.forEach(cp => (cp.ings || []).forEach(n => { const st = stockOfIng(n); if (st && st.st === 0) return; if (!st && (cp.bought || []).includes(n)) return; put(n, cp.title); }));
+  D.shop.forEach(x => put(x.name, "メモ", { shopAt: x.shop }));
+  const done = new Set(D.shopDone || []);
+  return [...out.values()].map(x => Object.assign(x, { done: done.has(x.name) }));
+}
+function stockView(){
+  const list = shopList(), by = g => list.filter(x => x.shopAt === g), selfPlans = D.plans.filter(p => p.scene === "self" && planIngs(p).length);
+  return "<h1>調達</h1>" +
+    "<h2>買う物</h2>" + (list.length ? '<div class="card">' + ["コンビニ", "スーパー"].filter(g => by(g).length).map(g => '<div class="note" style="margin-top:.2rem">' + g + "で買える</div>" +
+      by(g).map(x => '<button class="list-li" data-buy="' + esc(x.name) + '" style="width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left' + (x.done ? ";opacity:.45;text-decoration:line-through" : "") + '"><span>' + (x.done ? "✓ " : "") + esc(x.name) + (x.fresh ? ' <span class="lvl l">早めに使う</span>' : "") + '</span><span class="note">' + esc(x.from.join("、")) + "</span></button>").join("")).join("") +
+      '<p class="note" style="margin-top:.4rem">お店で、買った物を押して消していく。</p></div>' +
+      '<div class="row"><button class="btn" data-shop-finish>買い物を終える</button><button class="btn ghost" data-copy-shop>家族に送る文章をコピー</button></div>' : '<p class="note">今は買う物はありません。</p>') +
+    '<div class="row" style="margin-top:.5rem"><input id="shop-in" placeholder="買う物を足す(例:牛乳)" style="flex:2"><select id="shop-at" style="flex:1"><option>スーパー</option><option>コンビニ</option></select><button class="btn sm" data-shop-add>足す</button></div>' +
+    "<h2>作る予定</h2><p class=\"note\">作りたい料理を選ぶと、材料が買う物に入る(常備品で「ある」物は入れない)。作ったら、記録すると予定から消える。</p>" +
+    (D.cookPlan.length ? D.cookPlan.map((cp, i) => '<div class="item"><div class="row" style="justify-content:space-between"><b>' + esc(cp.title) + '</b><span>' + (cp.items.some(hasRecipe) ? '<button class="btn sm" data-recipe="' + esc(cp.items.join("|")) + '">作り方</button> ' : "") + '<button class="linkx" data-cp-del="' + i + '">やめる</button></span></div><div class="note">材料:' + cp.ings.map(n => { const st = stockOfIng(n); return esc(n) + (st && st.st === 0 ? "(ある)" : ""); }).join("、") + "</div></div>").join("") : "") +
+    '<details style="margin-top:.4rem"><summary class="note">作る予定を足す</summary>' + selfPlans.map(p => '<button class="plan" data-cp-add="' + D.plans.indexOf(p) + '"><span class="t">' + esc(p.title) + '</span><div class="note">材料:' + planIngs(p).map(esc).join("、") + "</div></button>").join("") + "</details>" +
+    "<h2>常備品</h2><p class=\"note\">気力ゼロの日の土台。押すたびに「ある → 少ない → ない」。使った物は、記録すると自動で「少ない」側に寄る。</p>" +
+    '<div class="stockgrid" style="margin-top:.6rem">' + D.stock.map((s, i) => '<button class="stock" data-st="' + i + '"><span>' + esc(s.name) + '</span><span class="lvl ' + STL[s.st][1] + '">' + STL[s.st][0] + "</span></button>").join("") + "</div>" +
+    '<details style="margin-top:1rem"><summary class="note">常備品を足す・消す</summary><div class="card"><div class="row"><input id="st-name" placeholder="名前" style="flex:2"><select id="st-shop" style="flex:1"><option>コンビニ</option><option>スーパー</option></select><button class="btn sm" data-st-add>足す</button></div>' +
+      D.stock.map((s, i) => '<div class="list-li"><span>' + esc(s.name) + ' <span class="note">' + s.shop + '</span></span><button class="linkx" data-st-del="' + i + '">消す</button></div>').join("") + "</div></details>";
+}
+
+/* ───────── 体重 ───────── */
+function weightView(){
+  const ks = daysBack(30), vals = ks.map(k => D.weights[k]), have = vals.filter(v => v != null);
+  const last = (() => { const ks2 = Object.keys(D.weights).sort(); return ks2.length ? D.weights[ks2[ks2.length - 1]] : ""; })();
+  const avg7 = ks.map((k, i) => { const xs = vals.slice(Math.max(0, i - 6), i + 1).filter(v => v != null); return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null; });
+  let chart = '<p class="note">記録すると、ここに30日の流れが出ます。</p>';
+  if (have.length) { const lo = Math.min(...have) - 0.5, hi = Math.max(...have) + 0.5, W = 320, H = 150, x = i => 10 + i * (W - 20) / 29, y = v => H - 12 - (v - lo) / (hi - lo) * (H - 30);
+    const line = avg7.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
+    chart = '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" role="img" aria-label="30日の体重の流れ"><text x="10" y="12" font-size="10" fill="var(--sub)">' + r1(hi) + 'kg</text><text x="10" y="' + (H - 2) + '" font-size="10" fill="var(--sub)">' + r1(lo) + "kg</text>" +
+      vals.map((v, i) => v == null ? "" : '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="2.5" fill="var(--sub)" opacity=".55"/>').join("") +
+      (line.length > 1 ? '<polyline points="' + line.map(p => p.join(",")).join(" ") + '" fill="none" stroke="var(--ai)" stroke-width="2.5" stroke-linecap="round"/>' : "") + "</svg>" +
+      '<p class="note">点は毎日の値、線は7日の平均。1日に1kgくらい上下するのはふつうなので、線を見る。</p>'; }
+  const a7 = avg7[avg7.length - 1];
+  return "<h1>体重</h1><div class=\"card\"><div class=\"note\">量る条件:" + esc(D.settings.weighCond) + '</div><div class="row" style="margin-top:.4rem"><input id="w-in" type="number" inputmode="decimal" step="0.1" placeholder="kg" value="' + (D.weights[today()] != null ? D.weights[today()] : last) + '" style="flex:1"><button class="btn" data-w-save>今日の体重を記録</button></div>' +
+    (a7 != null ? '<p style="margin-top:.5rem">7日の平均 <b>' + r1(a7) + " kg</b></p>" : "") + "</div>" +
+    '<div class="card">' + chart + "</div>" +
+    "<h2>これまで</h2>" + (Object.keys(D.weights).length ? '<div class="card">' + Object.keys(D.weights).sort().reverse().slice(0, 14).map(k => '<div class="list-li"><span>' + md(k) + "</span><span>" + D.weights[k] + ' kg <button class="linkx" data-w-del="' + k + '">消す</button></span></div>').join("") + "</div>" : '<p class="note">まだありません。</p>');
+}
+
+/* ───────── 図鑑・足りない物メモ・読み込み ───────── */
+function bookView(){
+  const q = norm(bookQ), list = D.foods.filter(f => !q || norm(f.name).includes(q) || (f.alias || []).some(a => norm(a).includes(q))).slice(0, 60);
+  return "<h1>図鑑</h1>" +
+    '<div class="card"><b>足りない物メモ</b><p class="note">図鑑にない物を、思いついたときに名前だけ書いておく。たまったら依頼文をコピーして、Claude に頼む。届いたファイルを下で読み込むと、メモから消えて、その名前で記録した食事にも栄養が入る。</p>' +
+      '<div class="row" style="margin-top:.4rem"><input id="memo-in" placeholder="例:台湾まぜそば(〇〇の店)" style="flex:1"><button class="btn sm" data-memo-add>書く</button></div>' +
+      (D.memo.length ? D.memo.map((m, i) => '<div class="list-li"><span>' + esc(m.name) + (m.note ? ' <span class="note">' + esc(m.note) + "</span>" : "") + '</span><button class="linkx" data-memo-del="' + i + '">消す</button></div>').join("") +
+        '<div class="row" style="margin-top:.5rem"><button class="btn" data-memo-copy>依頼文をコピー(' + D.memo.length + "件)</button></div>" + (D.memo.length >= 5 ? '<p class="note" style="color:var(--ai)">たまってきました。そろそろ頼みどきです。</p>' : "") : '<p class="note" style="margin-top:.4rem">今はありません。</p>') + "</div>" +
+    '<div class="card"><b>まとめて入れる</b><p class="note">Claude からもらったファイル(.json)を選ぶ。料理・作り方・「いま」の案・材料を、1つのファイルでまとめて入れられる。同じ名前の物は上書きする。</p><input type="file" id="food-file" accept=".json,application/json,text/plain" aria-label="図鑑ファイル">' +
+      (importPrev ? (importPrev.err ? '<p class="note" style="color:var(--bad)">' + esc(importPrev.err) + "</p>" :
+        '<p style="margin-top:.4rem">料理 ' + importPrev.list.length + "品(新しく " + importPrev.list.filter(x => !x.exists).length + "・上書き " + importPrev.list.filter(x => x.exists).length + ")" +
+        " ・ 作り方つき " + importPrev.list.filter(x => x.f.recipe).length + " ・ 案 " + importPrev.plans.length + " ・ 材料 " + importPrev.ings.length + '</p><div class="note">' + importPrev.list.slice(0, 12).map(x => esc(x.f.name)).join("、") + (importPrev.list.length > 12 ? "…" : "") + "</div>" +
+        '<button class="btn" data-import-go style="margin-top:.4rem">まとめて入れる</button>') : "") + "</div>" +
+    '<h2>入っている物(' + D.foods.length + '品)</h2><input id="book-q" placeholder="探す" value="' + esc(bookQ) + '" aria-label="図鑑を探す">' +
+    list.map(f => '<div class="item"><div class="row" style="justify-content:space-between"><b>' + esc(f.name) + '</b><span class="note">' + (f.recipe ? '<button class="linkx" data-recipe="' + esc(f.name) + '">作り方</button> ' : "") + esc(f.type) + " ・ " + f.src + "</span></div>" +
+      '<div class="row" style="margin:.2rem 0">' + shapeTags(f.shape) + (f.veg ? '<span class="note">野菜 ' + f.veg + "皿</span>" : "") + (f.fib ? '<span class="note">食物繊維 ' + f.fib + "g</span>" : "") + "</div>" + nutGrid(f) +
+      '<div class="note">' + MICRO.map((n, i) => f.micro[i] >= 3 ? n + "が" + LVNAME[f.micro[i]] : "").filter(Boolean).join("、") + "</div></div>").join("") +
+    '<p class="note" style="margin-top:.6rem">？は、ふつうの作り方や量から見込んだ推定値です。</p>';
+}
+const MEMO_PROMPT = names => "食卓アプリの図鑑ファイルを作ってください。次の料理・食べ物を、ふつうの1人前で。\n" + names.map(n => "・" + n).join("\n") +
+  "\n\n形式は、食卓アプリの図鑑ファイル(JSON)。name・alias・type・shape(主食主菜副菜の3桁)・kcal・p・f・c・fib・salt・veg・soupSalt・cook・micro(カルシウム,鉄,カリウム,ビタミンA,ビタミンB群,ビタミンC,ビタミンD,オメガ3 を1〜4)・src を入れてください。自分で作れる料理なら、recipe(time・ings[[材料,量]]・steps[[手順,タイマー秒]]、1人分)も入れてください。";
+function parseFoodFile(text){
+  let j; try { j = JSON.parse(String(text).trim()); } catch (e) { return { err: "読めませんでした(形式が崩れています):" + e.message }; }
+  const arr = Array.isArray(j) ? j : (j && j.foods) || [];
+  const plans = (j && Array.isArray(j.plans) ? j.plans : []).filter(x => x && x.title && Array.isArray(x.items)).map(x => ({ scene: ["fam", "self", "out", "buy"].includes(x.scene) ? x.scene : "self", effort: Array.isArray(x.effort) ? x.effort.map(Number) : [0, 1, 2], title: String(x.title), items: x.items.map(String), note: String(x.note || ""), ...(Array.isArray(x.ings) ? { ings: x.ings.map(String) } : {}), ...(x.soup ? { soup: x.soup } : {}) }));
+  const ings = (j && Array.isArray(j.ingredients) ? j.ingredients : []).filter(x => x && x.name).map(x => ({ name: String(x.name), shop: x.shop === "コンビニ" ? "コンビニ" : "スーパー", fresh: !!x.fresh, stock: x.stock || "" }));
+  if (!arr.length && !plans.length && !ings.length) return { err: "料理・案・材料のどれも入っていません" };
+  const list = []; arr.forEach(x => { if (!x || !x.name) return; const micro = Array.isArray(x.micro) ? x.micro.map(Number) : String(x.micro || "11111111").split("").map(Number);
+    const f = { name: String(x.name), alias: Array.isArray(x.alias) ? x.alias : String(x.alias || "").split(",").filter(Boolean), type: x.type || "その他", shape: String(x.shape || TYPE_SHAPE[x.type] || "000").padEnd(3, "0").slice(0, 3),
+      kcal: +x.kcal || 0, p: +x.p || 0, f: +x.f || 0, c: +x.c || 0, fib: +x.fib || 0, salt: +x.salt || 0, veg: +x.veg || 0, soupSalt: +x.soupSalt || 0, cook: COOK.includes(x.cook) ? x.cook : "煮る",
+      micro: MICRO.map((_, i) => Math.min(4, Math.max(1, micro[i] || 1))), stock: x.stock || "", src: x.src || "？" };
+    if (x.recipe && Array.isArray(x.recipe.steps)) f.recipe = { time: String(x.recipe.time || ""), ings: (x.recipe.ings || []).map(a => Array.isArray(a) ? [String(a[0]), String(a[1] || "")] : [String(a), ""]),
+      steps: x.recipe.steps.map(st => Array.isArray(st) ? [String(st[0]), +st[1] || 0] : [String(st.t || st), +st.sec || 0]) };
+    list.push({ f, exists: !!byName(f.name) }); });
+  return { list, plans, ings };
+}
+function applyImport(){
+  const names = [];
+  importPrev.list.forEach(({ f }) => { const ex = byName(f.name); if (ex) Object.assign(ex, f, { id: ex.id }); else D.foods.push(Object.assign({ id: "f" + uid() }, f)); names.push(f.name); });
+  (importPrev.plans || []).forEach(pl => { const i = D.plans.findIndex(x => x.scene === pl.scene && x.title === pl.title); if (i >= 0) D.plans[i] = pl; else D.plans.push(pl); });
+  (importPrev.ings || []).forEach(g => { D.ingInfo = (D.ingInfo || []).filter(x => x.name !== g.name).concat([g]); });
+  let filled = 0; D.logs.forEach(l => l.items.forEach(it => { if (!it.foodId) { const f = byName(it.name); if (f) { it.foodId = f.id; it.name = f.name; filled++; } } }));
+  D.memo = D.memo.filter(m => !byName(m.name));
+  const ff = document.getElementById("food-file"); if (ff) ff.value = "";
+  save(); toast((names.length ? names.length + "品" : "") + ((importPrev.plans || []).length ? (names.length ? "・" : "") + "案" + importPrev.plans.length + "つ" : "") + "を入れました" + (filled ? "(記録 " + filled + " 件に栄養が入りました)" : "")); importPrev = null; render();
+}
+
+/* ───────── 設定 ───────── */
+function setView(){
+  const s = D.settings, T = targets();
+  return "<h1>設定</h1><div class=\"card\"><b>目安を決めるための情報</b>" +
+    '<div class="row" style="margin-top:.4rem"><label class="note" style="flex:1">性別<select id="s-sex"><option value="m"' + (s.sex === "m" ? " selected" : "") + '>男</option><option value="f"' + (s.sex === "f" ? " selected" : "") + ">女</option></select></label>" +
+    '<label class="note" style="flex:1">年齢<input id="s-age" type="number" min="10" max="99" value="' + s.age + '"></label></div>' +
+    '<label class="note">体の動かし方<select id="s-act">' + ["少ない(座っていることが多い)", "ふつう(通学や家事、軽い運動)", "多い(よく運動する)"].map((l, i) => '<option value="' + i + '"' + (s.act === i ? " selected" : "") + ">" + l + "</option>").join("") + "</select></label>" +
+    '<label class="note">体重の目標<select id="s-goal">' + [["keep", "保つ"], ["up", "増やす"], ["down", "減らす"]].map(([k, l]) => '<option value="' + k + '"' + (s.goal === k ? " selected" : "") + ">" + l + "</option>").join("") + "</select></label>" +
+    '<label class="note">体重を量る条件<input id="s-wc" value="' + esc(s.weighCond) + '"></label>' +
+    '<p class="note" style="margin-top:.5rem">今の目安:エネルギー ' + Math.round(T.kcal[0]) + "〜" + Math.round(T.kcal[1]) + " kcal/日。たんぱく質・脂質・炭水化物は、そのエネルギーに対する割合の範囲で見ています(国の食事摂取基準の考え方)。成長期は体重が増えるのも自然なので、目標は自分で決めてください。</p>" +
+    '<button class="btn" data-s-save style="margin-top:.4rem">保存する</button></div>' +
+    ghCard() +
+    '<div class="card"><b>データの控え</b><p class="note">' + (conf ? "GitHubにも保存しています。念のための控えとして、書き出しもできます。" : "この端末の中だけに保存しています。機種変更や消えたときのために、ときどき書き出してください。") + '</p><div class="row"><button class="btn ghost" data-backup>書き出す</button><label class="btn ghost" style="display:inline-block">読み込む<input type="file" id="restore" accept=".json" class="hide"></label></div></div>' +
+    '<p class="note">版 ' + APP_VERSION + "</p>";
+}
+
+function ghCard(){
+  if (conf) return '<div class="card"><b>GitHubに保存</b><p class="note">' + esc(conf.repo) + " ・ " + esc(conf.branch || "main") + " ・ " + esc(conf.path) + '</p><div id="sync-line">' + syncLine() + '</div><div class="row" style="margin-top:.4rem"><button class="btn ghost sm" data-sync-now>今すぐ同期</button><button class="linkx" data-gh-off>この端末でつなぐのをやめる</button></div></div>';
+  return '<div class="card"><b>GitHubに保存</b><p class="note">スマホとパソコンで同じデータを使えるようにし、消える心配をなくす。行軍表と同じ非公開リポジトリに置くと、あとで行軍表や国力から食事のデータを読める。</p>' +
+    '<label class="note">リポジトリ(ユーザー名/リポジトリ名)<input id="g-repo" placeholder="例:nisenonamae/notion-daily"></label>' +
+    '<div class="row"><label class="note" style="flex:1">ブランチ<input id="g-branch" value="main"></label><label class="note" style="flex:2">置き場所<input id="g-path" value="shokutaku/data.json"></label></div>' +
+    '<label class="note">鍵(トークン)<input id="g-token" type="password" placeholder="github_pat_…"></label>' +
+    '<p class="note">鍵は、GitHubの Settings → Developer settings → Fine-grained tokens で作る。そのリポジトリだけを選び、Contents を Read and write にする。鍵はこの端末の中にだけ保存され、データの中には入らない。</p>' +
+    '<button class="btn" data-gh-on style="margin-top:.3rem">つないで同期する</button></div>';
+}
+
+/* ───────── 作り方・料理モード ───────── */
+let recipe = null, wakeLock = null, timer = null;
+const hasRecipe = n => { const f = byName(n); return !!(f && f.recipe); };
+function openRecipe(names){ const list = names.filter(hasRecipe); if (!list.length) { toast("この料理の作り方はまだありません"); return; } recipe = { list, di: 0, step: -1 }; render(); }
+function recipeView(){
+  const f = byName(recipe.list[recipe.di]), r = f.recipe, tabsH = recipe.list.length > 1 ? '<div class="row" role="group" aria-label="料理" style="margin:.3rem 0 .6rem">' + recipe.list.map((n, i) => '<button class="chip" data-rdi="' + i + '" aria-pressed="' + (i === recipe.di) + '">' + esc(n) + "</button>").join("") + "</div>" : "";
+  if (recipe.step >= 0) { const st = r.steps[recipe.step], last = recipe.step === r.steps.length - 1;
+    return '<div class="cook" role="dialog" aria-label="料理モード"><div class="row" style="justify-content:space-between"><span class="note">' + esc(f.name) + " ・ " + (recipe.step + 1) + " / " + r.steps.length + '</span><button class="linkx" data-rstep="-1">一覧に戻る</button></div>' +
+      '<div class="cook-dots">' + r.steps.map((_, i) => '<i class="' + (i < recipe.step ? "done" : i === recipe.step ? "now" : "") + '"></i>').join("") + "</div>" +
+      '<p class="cook-text">' + esc(st[0]) + "</p>" +
+      (st[1] ? '<div class="cook-timer"><span id="tm-disp">' + (timer && timer.step === recipe.step ? fmtSec(timer.left) : fmtSec(st[1])) + '</span><button class="btn" data-timer="' + st[1] + '">' + (timer && timer.step === recipe.step ? "タイマーを止める" : "タイマー " + fmtSec(st[1])) + "</button></div>" : "") +
+      '<div class="cook-nav"><button class="btn ghost" data-rstep="' + (recipe.step - 1) + '"' + (recipe.step === 0 ? " disabled" : "") + '>前へ</button><button class="btn" data-rstep="' + (last ? "done" : recipe.step + 1) + '">' + (last ? "できた" : "次へ") + "</button></div></div>"; }
+  return '<div class="sheet-bg" data-close-recipe></div><div class="sheet" role="dialog" aria-label="作り方"><div class="row" style="justify-content:space-between"><b>作り方</b><button class="linkx" data-close-recipe>閉じる</button></div>' + tabsH +
+    '<h2 style="margin-top:.3rem">' + esc(f.name) + (r.time ? ' <span class="note">約' + esc(r.time) + "</span>" : "") + "</h2>" +
+    '<div class="card"><b>材料(1人分)</b>' + r.ings.map(([n, a]) => { const st = stockOfIng(n); return '<div class="list-li"><span>' + esc(n) + (st ? ' <span class="lvl ' + STL[st.st][1] + '">' + STL[st.st][0] + "</span>" : "") + '</span><span class="note">' + esc(a) + "</span></div>"; }).join("") + "</div>" +
+    '<div class="card"><b>手順</b><ol style="margin:.4rem 0 0;padding-left:1.3rem">' + r.steps.map(([t, sec]) => "<li style=\"margin:.3rem 0\">" + esc(t) + (sec ? ' <span class="note">(' + fmtSec(sec) + ")</span>" : "") + "</li>").join("") + "</ol></div>" +
+    '<button class="btn" data-rstep="0" style="width:100%;margin-top:.4rem">料理モードで始める</button><p class="note" style="margin-top:.3rem">1手順ずつ大きく出す。料理中は画面が消えない。</p></div>';
+}
+const fmtSec = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+async function keepAwake(on){ try { if (on && "wakeLock" in navigator && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; } } catch (e) {} }
+function beep(){ try { const ac = new (window.AudioContext || window.webkitAudioContext)(); [0, .35, .7].forEach(t => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(.25, ac.currentTime + t); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t + .3); o.start(ac.currentTime + t); o.stop(ac.currentTime + t + .3); }); } catch (e) {} if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]); }
+function startTimer(sec){ stopTimer(); timer = { step: recipe.step, left: sec, id: setInterval(() => { timer.left--; const el = $("tm-disp"); if (el) el.textContent = fmtSec(Math.max(0, timer.left)); if (timer.left <= 0) { stopTimer(); beep(); toast("時間になりました"); render(); } }, 1000) }; }
+function stopTimer(){ if (timer) { clearInterval(timer.id); timer = null; } }
+
+/* ───────── 描画と操作 ───────── */
+function render(){
+  const V = { now: nowView, log: logView, stock: stockView, weight: weightView, book: bookView, set: setView };
+  $("app").innerHTML = V[tab]() + (sheet ? sheetView() : "") + (recipe ? recipeView() : "");
+  document.querySelectorAll("nav.tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab ? "true" : "false"));
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button,[data-close-sheet],[data-close-recipe]"); if (!b) return; const d = b.dataset;
+  if (d.recipe) { openRecipe(d.recipe.split("|")); return; }
+  if (b.hasAttribute("data-close-recipe")) { stopTimer(); keepAwake(false); recipe = null; render(); return; }
+  if (d.rdi) { recipe.di = +d.rdi; recipe.step = -1; stopTimer(); render(); return; }
+  if (d.rstep) { stopTimer(); if (d.rstep === "done") { const more = recipe.di < recipe.list.length - 1; if (more) { recipe.di++; recipe.step = 0; toast("次は「" + recipe.list[recipe.di] + "」"); } else { keepAwake(false); recipe = null; toast("できあがり。食べたら記録しよう"); } render(); return; }
+    recipe.step = Math.max(-1, +d.rstep); keepAwake(recipe.step >= 0); render(); window.scrollTo(0, 0); return; }
+  if (d.timer) { if (timer && timer.step === recipe.step) { stopTimer(); } else startTimer(+d.timer); render(); return; }
+  if (d.tab) { tab = d.tab; sheet = null; render(); window.scrollTo(0, 0); return; }
+  if (d.scene) { scene = d.scene; render(); return; }
+  if (d.effort) { effort = d.effort; render(); return; }
+  if (d.plan != null && d.plan !== "") { const p = D.plans[+d.plan]; openSheet(p.items, { soup: p.soup }); return; }
+  if (b.hasAttribute("data-open-free")) { openSheet([]); setTimeout(() => $("sheet-q") && $("sheet-q").focus(), 30); return; }
+  if (b.hasAttribute("data-close-sheet")) { sheet = null; render(); return; }
+  if (d.slot) { sheet.slot = d.slot; render(); return; }
+  if (d.add) { sheet.items.push(mkItem(d.add)); sheet.q = ""; render(); return; }
+  if (d.addNew) { sheet.items.push({ foodId: null, name: sheet.q.trim(), qty: 1, cook: null, soup: null, type: null }); sheet.q = ""; render(); return; }
+  if (d.rm != null && d.rm !== "") { sheet.items.splice(+d.rm, 1); render(); return; }
+  if (d.qty) { sheet.items[+d.qty].qty = +d.v; render(); return; }
+  if (d.soup) { sheet.items[+d.soup].soup = d.v; render(); return; }
+  if (d.itype) { sheet.items[+d.itype].type = d.v; render(); return; }
+  if (d.sat) { saveMeal(+d.sat); return; }
+  if (d.editLog) { const l = D.logs.find(x => x.id === d.editLog); sheet = { items: l.items.map(it => Object.assign({}, it)), slot: l.slot, q: "", editId: l.id }; render(); return; }
+  if (b.hasAttribute("data-del-log")) { if (!confirm("この記録を消す?")) return; D.logs = D.logs.filter(l => l.id !== sheet.editId); save(); sheet = null; toast("消しました"); render(); return; }
+  if (b.hasAttribute("data-nums")) { showNums = !showNums; render(); return; }
+  if (d.logsub) { logSub = d.logsub; if (logSub === "day") dayOff = D.logs.some(l => l.day === today()) ? 0 : 1; render(); return; }
+  if (d.day) { dayOff = Math.max(0, dayOff + +d.day); render(); return; }
+  if (d.goday) { logSub = "day"; dayOff = Math.round((new Date(today()) - new Date(d.goday)) / 864e5); render(); return; }
+  if (d.focus != null) { D.focus = d.focus || null; D.lastReview = Date.now(); save(); toast(d.focus ? "今週は「" + focusLabel(d.focus) + "」" : "今週はなし"); render(); return; }
+  if (d.st != null && d.st !== "") { const s = D.stock[+d.st]; s.st = (s.st + 1) % 3; save(); render(); return; }
+  if (b.hasAttribute("data-copy-shop")) { const t = "買ってきてほしいもの:" + shopList().filter(x => !x.done).map(x => x.name).join("、"); copy(t); return; }
+  if (d.buy) { const set = new Set(D.shopDone || []); set.has(d.buy) ? set.delete(d.buy) : set.add(d.buy); D.shopDone = [...set]; save(); render(); return; }
+  if (b.hasAttribute("data-shop-finish")) { const done = new Set(D.shopDone || []); if (!done.size) { toast("買った物を押してから終えてください"); return; }
+    done.forEach(n => { const st = stockOfIng(n) || D.stock.find(s => s.name === n); if (st) st.st = 0; });
+    D.shop = D.shop.filter(x => !done.has(x.name)); D.cookPlan.forEach(cp => cp.bought = (cp.bought || []).concat(cp.ings.filter(n => done.has(n))));
+    const n = done.size; D.shopDone = []; save(); toast(n + "個を買いました"); render(); return; }
+  if (b.hasAttribute("data-shop-add")) { const n = $("shop-in").value.trim(); if (!n) return; D.shop.push({ name: n, shop: $("shop-at").value }); save(); render(); return; }
+  if (d.cpAdd != null && d.cpAdd !== "") { const p = D.plans[+d.cpAdd]; D.cookPlan.push({ id: uid(), title: p.title, items: p.items, ings: planIngs(p), bought: [] }); save(); toast("「" + p.title + "」を作る予定に入れました"); render(); return; }
+  if (d.cpDel != null && d.cpDel !== "") { D.cookPlan.splice(+d.cpDel, 1); save(); render(); return; }
+  if (b.hasAttribute("data-st-add")) { const n = $("st-name").value.trim(); if (!n) return; D.stock.push({ id: "s" + uid(), name: n, shop: $("st-shop").value, st: 0 }); save(); render(); return; }
+  if (d.stDel != null && d.stDel !== "") { D.stock.splice(+d.stDel, 1); save(); render(); return; }
+  if (b.hasAttribute("data-w-save")) { const v = parseFloat($("w-in").value); if (!(v > 20 && v < 300)) { toast("kgで入れてください"); return; } D.weights[today()] = r1(v); save(); toast("記録しました"); render(); return; }
+  if (d.wDel) { delete D.weights[d.wDel]; save(); render(); return; }
+  if (b.hasAttribute("data-memo-add")) { const n = $("memo-in").value.trim(); if (!n) return; if (byName(n)) { toast("「" + byName(n).name + "」はもう図鑑にあります"); return; } D.memo.push({ name: n, note: "", t: Date.now() }); save(); render(); return; }
+  if (d.memoDel != null && d.memoDel !== "") { D.memo.splice(+d.memoDel, 1); save(); render(); return; }
+  if (b.hasAttribute("data-memo-copy")) { copy(MEMO_PROMPT(D.memo.map(m => m.name + (m.note ? "(" + m.note + ")" : "")))); return; }
+  if (b.hasAttribute("data-import-go")) { applyImport(); return; }
+  if (b.hasAttribute("data-s-save")) { const s = D.settings; s.sex = $("s-sex").value; s.age = Math.max(10, Math.min(99, +$("s-age").value || 17)); s.act = +$("s-act").value; s.goal = $("s-goal").value; s.weighCond = $("s-wc").value.trim() || s.weighCond; save(); toast("保存しました"); render(); return; }
+  if (b.hasAttribute("data-gh-on")) { const repo = $("g-repo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""), token = $("g-token").value.trim();
+    if (!/^[^/\s]+\/[^/\s]+$/.test(repo)) { toast("リポジトリは「ユーザー名/リポジトリ名」で入れてください"); return; } if (!token) { toast("鍵(トークン)を入れてください"); return; }
+    conf = { repo, branch: $("g-branch").value.trim() || "main", path: $("g-path").value.trim().replace(/^\//, "") || "shokutaku/data.json", token }; localStorage.setItem(CONF_KEY, JSON.stringify(conf)); base = null; localStorage.removeItem(BASE_KEY);
+    sync.state = "送信中"; render(); runSync(); return; }
+  if (b.hasAttribute("data-gh-off")) { if (!confirm("この端末でGitHubにつなぐのをやめる?(端末のデータとGitHubのデータは、どちらも消えない)")) return; conf = null; base = null; localStorage.removeItem(CONF_KEY); localStorage.removeItem(BASE_KEY); sync = { state: "未接続", at: null, err: "" }; render(); return; }
+  if (b.hasAttribute("data-sync-now")) { runSync(); return; }
+  if (b.hasAttribute("data-backup")) { const blob = new Blob([JSON.stringify(D, null, 1)], { type: "application/json" }), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "shokutaku-" + today() + ".json"; a.click(); return; }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "sheet-q") { const pos = e.target.selectionStart; sheet.q = e.target.value; render(); const el = $("sheet-q"); el.focus(); el.setSelectionRange(pos, pos); }
+  if (e.target.id === "book-q") { const pos = e.target.selectionStart; bookQ = e.target.value; render(); const el = $("book-q"); el.focus(); el.setSelectionRange(pos, pos); }
+});
+document.addEventListener("change", e => {
+  if (e.target.dataset.cook != null && e.target.dataset.cook !== "") { sheet.items[+e.target.dataset.cook].cook = e.target.value; render(); }
+  if (e.target.id === "food-file") { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { importPrev = parseFoodFile(rd.result); render(); }; rd.readAsText(f); }
+  if (e.target.id === "restore") { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const x = JSON.parse(rd.result); if (!x.v) throw 0; if (!confirm("今のデータを、このファイルで置き換える?")) return; D = Object.assign(blank(), x); save(); toast("読み込みました"); render(); } catch (err) { toast("読めませんでした"); } }; rd.readAsText(f); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && recipe) { stopTimer(); keepAwake(false); recipe = null; render(); return; } if (e.key === "Escape" && sheet) { sheet = null; render(); } });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && recipe && recipe.step >= 0) keepAwake(true); });
+function copy(t){ (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("コピーしました"), () => { prompt("コピーしてください", t); }); }
+render();
+if (conf) runSync();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
