@@ -114,6 +114,9 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700;box-shado
 .cook-nav .btn{padding:1.1rem 0;font-size:1.15rem}
 .hide{display:none!important}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+.nutin{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem;margin-top:.3rem}.nutin label{display:flex;flex-direction:column;font-size:.75rem;color:var(--sub,#777)}.nutin input{width:100%;margin:.15rem 0 0}.nutin small{font-size:.65rem}
+#de-ings,#de-steps{width:100%;font:inherit;font-size:.9rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -258,7 +261,7 @@ const STARTER_RECIPES = {
 </script>
 <script>
 "use strict";
-const APP_VERSION = "2026-10-27 m9";
+const APP_VERSION = "2026-11-08 m10";
 const KEY = "shokutaku-data";
 const MICRO = ["カルシウム", "鉄", "カリウム", "ビタミンA", "ビタミンB群", "ビタミンC", "ビタミンD", "オメガ3"];
 const LVFRAC = [0, 0.05, 0.17, 0.37, 0.6];        // 段階 → 1日に必要な量に対して1人前でどれくらいか
@@ -700,7 +703,10 @@ function weightView(){
 /* ───────── 図鑑・足りない物メモ・読み込み ───────── */
 function bookView(){
   const q = norm(bookQ), list = D.foods.filter(f => !q || norm(f.name).includes(q) || (f.alias || []).some(a => norm(a).includes(q))).slice(0, 60);
+  const pend = D.foods.filter(f => f.nutPending);
   return "<h1>図鑑</h1>" +
+    '<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>自分の料理</b><button class="btn sm" data-de-new>+ 料理を自分で登録</button></div><p class="note">材料と作り方を自分で書いて登録する。作り方は料理モードでそのまま使える。図鑑の料理の「直す」から、入っている料理の材料や作り方も直せる。</p>' +
+      (pend.length ? '<div style="margin-top:.4rem"><b style="font-size:.9rem">栄養がまだの料理(' + pend.length + '品)</b><div class="note">' + pend.map(f => esc(f.name)).join("、") + '</div><button class="btn ghost sm" data-pend-copy style="margin-top:.3rem">作り方ごと栄養を頼む文をコピー</button><p class="note">返ってきたファイルを下の「まとめて入れる」で読み込むと、栄養が入る(作り方はそのまま)。</p></div>' : "") + "</div>" +
     '<div class="card"><b>足りない物メモ</b><p class="note">図鑑にない物を、思いついたときに名前だけ書いておく。たまったら依頼文をコピーして、Claude に頼む。届いたファイルを下で読み込むと、メモから消えて、その名前で記録した食事にも栄養が入る。</p>' +
       '<div class="row" style="margin-top:.4rem"><input id="memo-in" placeholder="例:台湾まぜそば(〇〇の店)" style="flex:1"><button class="btn sm" data-memo-add>書く</button></div>' +
       (D.memo.length ? D.memo.map((m, i) => '<div class="list-li"><span>' + esc(m.name) + (m.note ? ' <span class="note">' + esc(m.note) + "</span>" : "") + '</span><button class="linkx" data-memo-del="' + i + '">消す</button></div>').join("") +
@@ -711,7 +717,7 @@ function bookView(){
         " ・ 作り方つき " + importPrev.list.filter(x => x.f.recipe).length + " ・ 案 " + importPrev.plans.length + " ・ 材料 " + importPrev.ings.length + '</p><div class="note">' + importPrev.list.slice(0, 12).map(x => esc(x.f.name)).join("、") + (importPrev.list.length > 12 ? "…" : "") + "</div>" +
         '<button class="btn" data-import-go style="margin-top:.4rem">まとめて入れる</button>') : "") + "</div>" +
     '<h2>入っている物(' + D.foods.length + '品)</h2><input id="book-q" placeholder="探す" value="' + esc(bookQ) + '" aria-label="図鑑を探す">' +
-    list.map(f => '<div class="item"><div class="row" style="justify-content:space-between"><b>' + esc(f.name) + '</b><span class="note">' + (f.recipe ? '<button class="linkx" data-recipe="' + esc(f.name) + '">作り方</button> ' : "") + esc(f.type) + " ・ " + f.src + "</span></div>" +
+    list.map(f => '<div class="item"><div class="row" style="justify-content:space-between"><b>' + esc(f.name) + '</b><span class="note">' + (f.recipe ? '<button class="linkx" data-recipe="' + esc(f.name) + '">作り方</button> ' : "") + '<button class="linkx" data-de-edit="' + f.id + '">直す</button> ' + esc(f.type) + " ・ " + (f.nutPending ? '<span style="color:var(--ai)">栄養まだ</span>' : f.src) + "</span></div>" +
       '<div class="row" style="margin:.2rem 0">' + shapeTags(f.shape) + (f.veg ? '<span class="note">野菜 ' + f.veg + "皿</span>" : "") + (f.fib ? '<span class="note">食物繊維 ' + f.fib + "g</span>" : "") + "</div>" + nutGrid(f) +
       '<div class="note">' + MICRO.map((n, i) => f.micro[i] >= 3 ? n + "が" + LVNAME[f.micro[i]] : "").filter(Boolean).join("、") + "</div></div>").join("") +
     '<p class="note" style="margin-top:.6rem">？は、ふつうの作り方や量から見込んだ推定値です。</p>';
@@ -735,7 +741,7 @@ function parseFoodFile(text){
 }
 function applyImport(){
   const names = [];
-  importPrev.list.forEach(({ f }) => { const ex = byName(f.name); if (ex) Object.assign(ex, f, { id: ex.id }); else D.foods.push(Object.assign({ id: "f" + uid() }, f)); names.push(f.name); });
+  importPrev.list.forEach(({ f }) => { const ex = byName(f.name); if (ex) { const keepSrc = ex.src === "自分" && (!f.src || f.src === "？"); Object.assign(ex, f, { id: ex.id }); delete ex.nutPending; if (keepSrc) ex.src = "自分"; } else D.foods.push(Object.assign({ id: "f" + uid() }, f)); names.push(f.name); });
   (importPrev.plans || []).forEach(pl => { const i = D.plans.findIndex(x => x.scene === pl.scene && x.title === pl.title); if (i >= 0) D.plans[i] = pl; else D.plans.push(pl); });
   (importPrev.ings || []).forEach(g => { D.ingInfo = (D.ingInfo || []).filter(x => x.name !== g.name).concat([g]); });
   let filled = 0; D.logs.forEach(l => l.items.forEach(it => { if (!it.foodId) { const f = byName(it.name); if (f) { it.foodId = f.id; it.name = f.name; filled++; } } }));
@@ -786,7 +792,7 @@ function recipeView(){
     '<h2 style="margin-top:.3rem">' + esc(f.name) + (r.time ? ' <span class="note">約' + esc(r.time) + "</span>" : "") + "</h2>" +
     '<div class="card"><b>材料(1人分)</b>' + r.ings.map(([n, a]) => { const st = stockOfIng(n); return '<div class="list-li"><span>' + esc(n) + (st ? ' <span class="lvl ' + STL[st.st][1] + '">' + STL[st.st][0] + "</span>" : "") + '</span><span class="note">' + esc(a) + "</span></div>"; }).join("") + "</div>" +
     '<div class="card"><b>手順</b><ol style="margin:.4rem 0 0;padding-left:1.3rem">' + r.steps.map(([t, sec]) => "<li style=\"margin:.3rem 0\">" + esc(t) + (sec ? ' <span class="note">(' + fmtSec(sec) + ")</span>" : "") + "</li>").join("") + "</ol></div>" +
-    '<button class="btn" data-rstep="0" style="width:100%;margin-top:.4rem">料理モードで始める</button><p class="note" style="margin-top:.3rem">1手順ずつ大きく出す。料理中は画面が消えない。</p></div>';
+    '<button class="btn" data-rstep="0" style="width:100%;margin-top:.4rem">料理モードで始める</button><p class="note" style="margin-top:.3rem">1手順ずつ大きく出す。料理中は画面が消えない。 <button class="linkx" data-de-edit="' + f.id + '">作り方を直す</button></p></div>';
 }
 const fmtSec = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 async function keepAwake(on){ try { if (on && "wakeLock" in navigator && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; } } catch (e) {} }
@@ -794,15 +800,66 @@ function beep(){ try { const ac = new (window.AudioContext || window.webkitAudio
 function startTimer(sec){ stopTimer(); timer = { step: recipe.step, left: sec, id: setInterval(() => { timer.left--; const el = $("tm-disp"); if (el) el.textContent = fmtSec(Math.max(0, timer.left)); if (timer.left <= 0) { stopTimer(); beep(); toast("時間になりました"); render(); } }, 1000) }; }
 function stopTimer(){ if (timer) { clearInterval(timer.id); timer = null; } }
 
+/* ───────── 料理を自分で登録・直す ─────────
+   材料は1行に1つ(「豚こま切れ肉 100g」)、手順は1行に1つ。手順の中の「10分」などは、料理モードのタイマーになる。
+   栄養は分かる所だけ。空のままなら「栄養がまだの料理」に入り、作り方ごと Claude に頼める */
+let dishEd = null;
+const AMT_RE = /^(.*?)[\s　:：…]+((?:[0-9０-９][0-9０-９./／〜~\-ー]*\s*\S*.*)|[0-9０-９]|適量|少々|少し|ひとつまみ|お好みで|適宜|大さじ.*|小さじ.*|ひとかけ.*|\d.*)$/;
+function parseIngLines(t){ return String(t || "").split("\n").map(x => x.trim()).filter(Boolean).map(l => { l = l.replace(/^[-・*]\s*/, ""); const m = AMT_RE.exec(l); return m && m[1].trim() ? [m[1].trim(), m[2].trim()] : [l, ""]; }); }
+const secOf = t => { t = String(t || "").normalize("NFKC"); let m = /(\d+)\s*分\s*(\d+)\s*秒/.exec(t); if (m) return +m[1] * 60 + +m[2]; m = /(\d+(?:\.\d+)?)\s*分(?!の)/.exec(t); if (m) return Math.round(+m[1] * 60); m = /(\d+)\s*秒/.exec(t); if (m) return +m[1]; return 0; };
+function parseStepLines(t){ return String(t || "").split("\n").map(x => x.trim()).filter(Boolean).map(l => { l = l.replace(/^\s*(?:\d+\s*[.)．、:]|[-・*])\s*/, ""); const tag = /\s*\[([^\]]*)\]\s*$/.exec(l);
+  const text = tag ? l.slice(0, tag.index).trim() : l, sec = tag ? (/なし/.test(tag[1]) ? 0 : secOf(tag[1])) : secOf(l); return [text, sec]; }); }
+const ingText = r => (r && r.ings || []).map(([n, a]) => n + (a ? " " + a : "")).join("\n");
+const stepText = r => (r && r.steps || []).map(([t, s]) => t + (s && secOf(t) !== s ? " [" + fmtSec(s).replace(/^(\d+):00$/, "$1分").replace(/^0:(\d+)$/, "$1秒") + "]" : "")).join("\n");
+const NUTS = [["kcal", "エネルギー", "kcal"], ["p", "たんぱく質", "g"], ["f", "脂質", "g"], ["c", "炭水化物", "g"], ["salt", "塩分", "g"], ["veg", "野菜", "皿"]];
+function openDishEd(id){ const f = id ? foodById(id) : null; dishEd = { id: f ? f.id : null }; render();
+  setTimeout(() => { const n = $("de-name"); if (n && !f) n.focus(); dishPreview(); }, 30); }
+function dishEdView(){ const f = dishEd.id ? foodById(dishEd.id) : null, r = f && f.recipe, num = k => f && !f.nutPending && f[k] ? f[k] : "";
+  return '<div class="sheet-bg" data-de-close></div><div class="sheet" role="dialog" aria-label="料理を登録"><div class="row" style="justify-content:space-between"><b>' + (f ? "料理を直す" : "料理を登録") + '</b><button class="linkx" data-de-close>閉じる</button></div>' +
+    '<div class="card"><label class="note">名前</label><input id="de-name" value="' + esc(f ? f.name : "") + '" placeholder="例:豚こまとキャベツの炒め物">' +
+      '<label class="note" style="margin-top:.4rem;display:block">別名(カンマで区切る。記録するときにこの名前でも見つかる)</label><input id="de-alias" value="' + esc(f ? (f.alias || []).join(",") : "") + '" placeholder="例:豚キャベ炒め">' +
+      '<div class="row" style="gap:.5rem;margin-top:.4rem"><label class="note">種類 <select id="de-type">' + Object.keys(TYPE_SHAPE).map(k => '<option' + ((f ? f.type : "主菜") === k ? " selected" : "") + ">" + k + "</option>").join("") + '</select></label>' +
+      '<label class="note">主な作り方 <select id="de-cook">' + COOK.map(k => '<option' + ((f ? f.cook : "炒める") === k ? " selected" : "") + ">" + k + "</option>").join("") + "</select></label></div></div>" +
+    '<div class="card"><b>作り方(1人分)</b><div class="row" style="margin:.3rem 0"><label class="note">かかる時間 <input id="de-time" value="' + esc(r ? r.time : "") + '" placeholder="15分" style="width:6em"></label></div>' +
+      '<label class="note">材料(1行に1つ。名前と量を空白で区切る)</label><textarea id="de-ings" rows="5" placeholder="豚こま切れ肉 100g&#10;キャベツ 2枚&#10;ごま油 小さじ1&#10;塩こしょう 少々">' + esc(ingText(r)) + "</textarea>" +
+      '<label class="note" style="display:block;margin-top:.4rem">手順(1行に1つ。「5分」のように時間を書くと、料理モードでタイマーになる。タイマーを付けないときは行の最後に [なし])</label><textarea id="de-steps" rows="6" placeholder="キャベツをざく切りにする&#10;フライパンにごま油を熱し、豚肉を炒める(3分)&#10;キャベツを入れて2分炒め、塩こしょうで味をととのえる">' + esc(stepText(r)) + "</textarea>" +
+      '<div id="de-pv" class="note" style="margin-top:.4rem"></div></div>' +
+    '<div class="card"><b>栄養(1人前・分かる所だけ)</b><p class="note">空のままなら「栄養がまだの料理」に入り、図鑑から作り方ごと Claude に頼める(この作り方の材料と量から見積もってもらえる)。</p><div class="nutin">' +
+      NUTS.map(([k, l, u]) => '<label><span>' + l + '</span><input id="de-' + k + '" inputmode="decimal" value="' + esc(num(k)) + '"><small>' + u + "</small></label>").join("") + "</div></div>" +
+    '<div class="row" style="justify-content:space-between;margin-top:.4rem"><button class="btn" data-de-save>' + (f ? "直す" : "登録する") + "</button>" + (f ? '<button class="linkx" data-de-del style="color:var(--bad)">この料理を図鑑から消す</button>' : "") + "</div></div>"; }
+function dishPreview(){ const el = $("de-pv"); if (!el) return; const ings = parseIngLines(($("de-ings") || {}).value), steps = parseStepLines(($("de-steps") || {}).value);
+  el.innerHTML = ings.length || steps.length ? "読み取り:材料 " + ings.length + "つ(" + ings.slice(0, 4).map(([n, a]) => esc(n) + (a ? "<b>" + esc(a) + "</b>" : "")).join("、") + (ings.length > 4 ? "…" : "") + ")・手順 " + steps.length + "つ" + (steps.some(s => s[1]) ? "(タイマー " + steps.map((s, i) => s[1] ? (i + 1) + "番 " + fmtSec(s[1]) : "").filter(Boolean).join("・") + ")" : "") : ""; }
+function saveDish(){ const name = $("de-name").value.trim(); if (!name) { toast("名前を入れてください"); return; }
+  const f0 = dishEd.id ? foodById(dishEd.id) : null, other = byName(name); if (other && other !== f0) { toast("「" + other.name + "」が図鑑にもうある(直すならその料理の「直す」から)"); return; }
+  const type = $("de-type").value, ings = parseIngLines($("de-ings").value), steps = parseStepLines($("de-steps").value), time = $("de-time").value.trim();
+  const nut = {}; let any = false; NUTS.forEach(([k]) => { const v = String($("de-" + k).value || "").normalize("NFKC").trim(); if (v !== "" && isFinite(+v)) { nut[k] = +v; any = true; } });
+  const f = f0 || { id: "f" + uid(), kcal: 0, p: 0, f: 0, c: 0, fib: 0, salt: 0, veg: 0, soupSalt: 0, micro: MICRO.map(() => 2), stock: "", src: "自分", builtin: false };
+  Object.assign(f, { name, alias: $("de-alias").value.split(/[,、，]/).map(x => x.trim()).filter(Boolean), type, shape: TYPE_SHAPE[type] || "000", cook: $("de-cook").value });
+  if (ings.length || steps.length) f.recipe = { time, ings, steps }; else delete f.recipe;
+  if (any) { Object.assign(f, nut); delete f.nutPending; if (f.src === "？") f.src = "自分"; } else if (!f0 || f0.nutPending) f.nutPending = true;
+  if (!f0) D.foods.push(f);
+  let filled = 0; D.logs.forEach(l => l.items.forEach(it => { if (!it.foodId) { const g = byName(it.name); if (g === f) { it.foodId = f.id; it.name = f.name; filled++; } } }));
+  D.memo = D.memo.filter(m => !byName(m.name)); save(); toast((f0 ? "直しました" : "「" + name + "」を登録しました") + (f.nutPending ? "(栄養はまだ)" : "") + (filled ? "・記録 " + filled + " 件につないだ" : "")); dishEd = null; render(); }
+const PENDING_PROMPT = list => "食卓アプリの図鑑ファイルを作ってください。次の料理は、私の作り方(1人分)を下に書きました。この材料と量から、1人前の栄養を見積もってください。recipe は入れないでください(こちらの作り方をそのまま使います)。\n\n" +
+  list.map(f => "【" + f.name + "】(" + f.type + ")\n材料:" + ((f.recipe && f.recipe.ings) || []).map(([n, a]) => n + (a ? " " + a : "")).join("、") + "\n手順:" + ((f.recipe && f.recipe.steps) || []).map(([t]) => t).join(" → ")).join("\n\n") +
+  "\n\n形式は、食卓アプリの図鑑ファイル(JSON)。name(上の名前のまま)・alias・type・shape(主食主菜副菜の3桁)・kcal・p・f・c・fib・salt・veg・soupSalt・cook・micro(カルシウム,鉄,カリウム,ビタミンA,ビタミンB群,ビタミンC,ビタミンD,オメガ3 を1〜4)・src を入れてください。";
+
 /* ───────── 描画と操作 ───────── */
 function render(){
   const V = { now: nowView, log: logView, stock: stockView, weight: weightView, book: bookView, set: setView };
-  $("app").innerHTML = V[tab]() + (sheet ? sheetView() : "") + (recipe ? recipeView() : "");
+  $("app").innerHTML = V[tab]() + (sheet ? sheetView() : "") + (recipe ? recipeView() : "") + (dishEd ? dishEdView() : "");
   document.querySelectorAll("nav.tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab ? "true" : "false"));
 }
+document.addEventListener("input", e => { if (e.target && (e.target.id === "de-ings" || e.target.id === "de-steps")) dishPreview(); });
 document.addEventListener("click", e => {
-  const b = e.target.closest("button,[data-close-sheet],[data-close-recipe]"); if (!b) return; const d = b.dataset;
+  const b = e.target.closest("button,[data-close-sheet],[data-close-recipe],[data-de-close]"); if (!b) return; const d = b.dataset;
   if (d.recipe) { openRecipe(d.recipe.split("|")); return; }
+  if (b.hasAttribute("data-de-new")) { openDishEd(null); return; }
+  if (d.deEdit) { stopTimer(); keepAwake(false); recipe = null; openDishEd(d.deEdit); return; }
+  if (b.hasAttribute("data-de-close")) { dishEd = null; render(); return; }
+  if (b.hasAttribute("data-de-save")) { saveDish(); return; }
+  if (b.hasAttribute("data-de-del")) { const f = foodById(dishEd.id); if (!f || !confirm("「" + f.name + "」を図鑑から消す?(記録はそのまま残る)")) return; D.foods = D.foods.filter(x => x !== f); D.logs.forEach(l => l.items.forEach(it => { if (it.foodId === f.id) it.foodId = null; })); save(); dishEd = null; toast("消しました"); render(); return; }
+  if (b.hasAttribute("data-pend-copy")) { copy(PENDING_PROMPT(D.foods.filter(f => f.nutPending))); return; }
   if (b.hasAttribute("data-close-recipe")) { stopTimer(); keepAwake(false); recipe = null; render(); return; }
   if (d.rdi) { recipe.di = +d.rdi; recipe.step = -1; stopTimer(); render(); return; }
   if (d.rstep) { stopTimer(); if (d.rstep === "done") { const more = recipe.di < recipe.list.length - 1; if (more) { recipe.di++; recipe.step = 0; toast("次は「" + recipe.list[recipe.di] + "」"); } else { keepAwake(false); recipe = null; toast("できあがり。食べたら記録しよう"); } render(); return; }
